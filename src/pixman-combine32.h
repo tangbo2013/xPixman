@@ -38,10 +38,10 @@
     defined(__ARM_ARCH_7A__)  || defined(__ARM_ARCH_7R__)  || \
     defined(__ARM_ARCH_7M__)  || defined(__ARM_ARCH_7EM__)
 
-static force_inline uint32_t
-un8x4_add_un8x4 (uint32_t x, uint32_t y)
+static force_inline xuint32_t
+un8x4_add_un8x4 (xuint32_t x, xuint32_t y)
 {
-    uint32_t t;
+    xuint32_t t;
     asm ("uqadd8 %0, %1, %2" : "=r" (t) : "%r" (x), "r" (y));
     return t;
 }
@@ -65,15 +65,15 @@ un8x4_add_un8x4 (uint32_t x, uint32_t y)
  */
 
 #define MUL_UN8(a, b, t)						\
-    ((t) = (a) * (uint16_t)(b) + ONE_HALF, ((((t) >> G_SHIFT ) + (t) ) >> G_SHIFT ))
+    ((t) = (a) * (xuint16_t)(b) + ONE_HALF, ((((t) >> G_SHIFT ) + (t) ) >> G_SHIFT ))
 
 #define DIV_UN8(a, b)							\
-    (((uint16_t) (a) * MASK + ((b) / 2)) / (b))
+    (((xuint16_t) (a) * MASK + ((b) / 2)) / (b))
 
 #ifndef ADD_UN8
 #define ADD_UN8(x, y, t)				     \
     ((t) = (x) + (y),					     \
-     (uint32_t) (uint8_t) ((t) | (0 - ((t) >> G_SHIFT))))
+     (xuint32_t) (xuint8_t) ((t) | (0 - ((t) >> G_SHIFT))))
 #endif
 
 #define DIV_ONE_UN8(x)							\
@@ -128,7 +128,7 @@ un8x4_add_un8x4 (uint32_t x, uint32_t y)
 #define UN8x4_MUL_UN8(x, a)						\
     do									\
     {									\
-	uint32_t r1__, r2__, t__;					\
+	xuint32_t r1__, r2__, t__;					\
 									\
 	r1__ = (x);							\
 	UN8_rb_MUL_UN8 (r1__, (a), t__);				\
@@ -145,7 +145,7 @@ un8x4_add_un8x4 (uint32_t x, uint32_t y)
 #define UN8x4_MUL_UN8_ADD_UN8x4(x, a, y)				\
     do									\
     {									\
-	uint32_t r1__, r2__, r3__, t__;					\
+	xuint32_t r1__, r2__, r3__, t__;					\
 									\
 	r1__ = (x);							\
 	r2__ = (y) & RB_MASK;						\
@@ -166,7 +166,7 @@ un8x4_add_un8x4 (uint32_t x, uint32_t y)
 #define UN8x4_MUL_UN8_ADD_UN8x4_MUL_UN8(x, a, y, b)			\
     do									\
     {									\
-	uint32_t r1__, r2__, r3__, t__;					\
+	xuint32_t r1__, r2__, r3__, t__;					\
 									\
 	r1__ = (x);							\
 	r2__ = (y);							\
@@ -189,7 +189,7 @@ un8x4_add_un8x4 (uint32_t x, uint32_t y)
 #define UN8x4_MUL_UN8x4(x, a)						\
     do									\
     {									\
-	uint32_t r1__, r2__, r3__, t__;					\
+	xuint32_t r1__, r2__, r3__, t__;					\
 									\
 	r1__ = (x);							\
 	r2__ = (a);							\
@@ -208,7 +208,7 @@ un8x4_add_un8x4 (uint32_t x, uint32_t y)
 #define UN8x4_MUL_UN8x4_ADD_UN8x4(x, a, y)				\
     do									\
     {									\
-	uint32_t r1__, r2__, r3__, t__;					\
+	xuint32_t r1__, r2__, r3__, t__;					\
 									\
 	r1__ = (x);							\
 	r2__ = (a);							\
@@ -231,7 +231,7 @@ un8x4_add_un8x4 (uint32_t x, uint32_t y)
 #define UN8x4_MUL_UN8x4_ADD_UN8x4_MUL_UN8(x, a, y, b)			\
     do									\
     {									\
-	uint32_t r1__, r2__, r3__, t__;					\
+	xuint32_t r1__, r2__, r3__, t__;					\
 									\
 	r1__ = (x);							\
 	r2__ = (a);							\
@@ -257,7 +257,7 @@ un8x4_add_un8x4 (uint32_t x, uint32_t y)
 #define UN8x4_ADD_UN8x4(x, y)						\
     do									\
     {									\
-	uint32_t r1__, r2__, r3__, t__;					\
+	xuint32_t r1__, r2__, r3__, t__;					\
 									\
 	r1__ = (x) & RB_MASK;						\
 	r2__ = (y) & RB_MASK;						\

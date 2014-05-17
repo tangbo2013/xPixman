@@ -30,8 +30,8 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdlib.h>
-#include <math.h>
+#include <xC/xmemory.h>
+#include <xClib/math.h>
 #include "pixman-private.h"
 
 static inline pixman_fixed_32_32_t
@@ -66,7 +66,7 @@ fdot (double x1,
     return x1 * x2 + y1 * y2 + z1 * z2;
 }
 
-static uint32_t
+static xuint32_t
 radial_compute_color (double                    a,
 		      double                    b,
 		      double                    c,
@@ -155,8 +155,8 @@ radial_compute_color (double                    a,
     return 0;
 }
 
-static uint32_t *
-radial_get_scanline_narrow (pixman_iter_t *iter, const uint32_t *mask)
+static xuint32_t *
+radial_get_scanline_narrow (pixman_iter_t *iter, const xuint32_t *mask)
 {
     /*
      * Implementation of radial gradients following the PDF specification.
@@ -243,11 +243,11 @@ radial_get_scanline_narrow (pixman_iter_t *iter, const uint32_t *mask)
     int x = iter->x;
     int y = iter->y;
     int width = iter->width;
-    uint32_t *buffer = iter->buffer;
+    xuint32_t *buffer = iter->buffer;
 
     gradient_t *gradient = (gradient_t *)image;
     radial_gradient_t *radial = (radial_gradient_t *)image;
-    uint32_t *end = buffer + width;
+    xuint32_t *end = buffer + width;
     pixman_gradient_walker_t walker;
     pixman_vector_t v, unit;
 
@@ -400,10 +400,10 @@ radial_get_scanline_narrow (pixman_iter_t *iter, const uint32_t *mask)
     return iter->buffer;
 }
 
-static uint32_t *
-radial_get_scanline_wide (pixman_iter_t *iter, const uint32_t *mask)
+static xuint32_t *
+radial_get_scanline_wide (pixman_iter_t *iter, const xuint32_t *mask)
 {
-    uint32_t *buffer = radial_get_scanline_narrow (iter, NULL);
+    xuint32_t *buffer = radial_get_scanline_narrow (iter, XNULL);
 
     pixman_expand_to_float (
 	(argb_t *)buffer, buffer, PIXMAN_a8r8g8b8, iter->width);
@@ -434,14 +434,14 @@ pixman_image_create_radial_gradient (const pixman_point_fixed_t *  inner,
     image = _pixman_image_allocate ();
 
     if (!image)
-	return NULL;
+	return XNULL;
 
     radial = &image->radial;
 
     if (!_pixman_init_gradient (&radial->common, stops, n_stops))
     {
-	free (image);
-	return NULL;
+    xmemory_free (image);
+	return XNULL;
     }
 
     image->type = RADIAL;

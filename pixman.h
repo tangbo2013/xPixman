@@ -69,7 +69,7 @@ SOFTWARE.
 #ifndef PIXMAN_H__
 #define PIXMAN_H__
 
-#include <pixman-version.h>
+#include "./pixman-version.h"
 
 #ifdef  __cplusplus
 #define PIXMAN_BEGIN_DECLS extern "C" {
@@ -87,23 +87,7 @@ PIXMAN_BEGIN_DECLS
 
 #if !defined (PIXMAN_DONT_DEFINE_STDINT)
 
-#if defined (_SVR4) || defined (SVR4) || defined (__OpenBSD__) || defined (_sgi) || defined (__sun) || defined (sun) || defined (__digital__) || defined (__HP_cc)
-#  include <inttypes.h>
-/* VS 2010 (_MSC_VER 1600) has stdint.h */
-#elif defined (_MSC_VER) && _MSC_VER < 1600
-typedef __int8 int8_t;
-typedef unsigned __int8 uint8_t;
-typedef __int16 int16_t;
-typedef unsigned __int16 uint16_t;
-typedef __int32 int32_t;
-typedef unsigned __int32 uint32_t;
-typedef __int64 int64_t;
-typedef unsigned __int64 uint64_t;
-#elif defined (_AIX)
-#  include <sys/inttypes.h>
-#else
-#  include <stdint.h>
-#endif
+#include "../xC/xinteger.h"
 
 #endif
 
@@ -115,11 +99,11 @@ typedef int pixman_bool_t;
 /*
  * Fixpoint numbers
  */
-typedef int64_t			pixman_fixed_32_32_t;
+typedef xint64_t			pixman_fixed_32_32_t;
 typedef pixman_fixed_32_32_t	pixman_fixed_48_16_t;
-typedef uint32_t		pixman_fixed_1_31_t;
-typedef uint32_t		pixman_fixed_1_16_t;
-typedef int32_t			pixman_fixed_16_16_t;
+typedef xuint32_t		pixman_fixed_1_31_t;
+typedef xuint32_t		pixman_fixed_1_16_t;
+typedef xint32_t			pixman_fixed_16_16_t;
 typedef pixman_fixed_16_16_t	pixman_fixed_t;
 
 #define pixman_fixed_e			((pixman_fixed_t) 1)
@@ -149,10 +133,10 @@ typedef struct pixman_transform pixman_transform_t;
 
 struct pixman_color
 {
-    uint16_t	red;
-    uint16_t    green;
-    uint16_t    blue;
-    uint16_t    alpha;
+    xuint16_t	red;
+    xuint16_t    green;
+    xuint16_t    blue;
+    xuint16_t    alpha;
 };
 
 struct pixman_point_fixed
@@ -398,13 +382,13 @@ struct pixman_region16_data {
 
 struct pixman_rectangle16
 {
-    int16_t	x, y;
-    uint16_t	width, height;
+    xint16_t	x, y;
+    xuint16_t	width, height;
 };
 
 struct pixman_box16
 {
-    int16_t x1, y1, x2, y2;
+    xint16_t x1, y1, x2, y2;
 };
 
 struct pixman_region16
@@ -507,13 +491,13 @@ struct pixman_region32_data {
 
 struct pixman_rectangle32
 {
-    int32_t x, y;
-    uint32_t width, height;
+    xint32_t x, y;
+    xuint32_t width, height;
 };
 
 struct pixman_box32
 {
-    int32_t x1, y1, x2, y2;
+    xint32_t x1, y1, x2, y2;
 };
 
 struct pixman_region32
@@ -589,8 +573,8 @@ void			pixman_region32_clear		   (pixman_region32_t *region);
 
 
 /* Copy / Fill / Misc */
-pixman_bool_t pixman_blt                (uint32_t           *src_bits,
-					 uint32_t           *dst_bits,
+pixman_bool_t pixman_blt                (xuint32_t           *src_bits,
+                     xuint32_t           *dst_bits,
 					 int                 src_stride,
 					 int                 dst_stride,
 					 int                 src_bpp,
@@ -601,14 +585,14 @@ pixman_bool_t pixman_blt                (uint32_t           *src_bits,
 					 int                 dest_y,
 					 int                 width,
 					 int                 height);
-pixman_bool_t pixman_fill               (uint32_t           *bits,
+pixman_bool_t pixman_fill               (xuint32_t           *bits,
 					 int                 stride,
 					 int                 bpp,
 					 int                 x,
 					 int                 y,
 					 int                 width,
 					 int                 height,
-					 uint32_t            _xor);
+                     xuint32_t            _xor);
 
 int           pixman_version            (void);
 const char*   pixman_version_string     (void);
@@ -619,8 +603,8 @@ const char*   pixman_version_string     (void);
 typedef struct pixman_indexed		pixman_indexed_t;
 typedef struct pixman_gradient_stop	pixman_gradient_stop_t;
 
-typedef uint32_t (* pixman_read_memory_func_t) (const void *src, int size);
-typedef void     (* pixman_write_memory_func_t) (void *dst, uint32_t value, int size);
+typedef xuint32_t (* pixman_read_memory_func_t) (const void *src, int size);
+typedef void     (* pixman_write_memory_func_t) (void *dst, xuint32_t value, int size);
 
 typedef void     (* pixman_image_destroy_func_t) (pixman_image_t *image, void *data);
 
@@ -632,13 +616,13 @@ struct pixman_gradient_stop {
 #define PIXMAN_MAX_INDEXED  256 /* XXX depth must be <= 8 */
 
 #if PIXMAN_MAX_INDEXED <= 256
-typedef uint8_t pixman_index_type;
+typedef xuint8_t pixman_index_type;
 #endif
 
 struct pixman_indexed
 {
     pixman_bool_t       color;
-    uint32_t		rgba[PIXMAN_MAX_INDEXED];
+    xuint32_t		rgba[PIXMAN_MAX_INDEXED];
     pixman_index_type	ent[32768];
 };
 
@@ -779,12 +763,12 @@ pixman_image_t *pixman_image_create_conical_gradient (const pixman_point_fixed_t
 pixman_image_t *pixman_image_create_bits             (pixman_format_code_t          format,
 						      int                           width,
 						      int                           height,
-						      uint32_t                     *bits,
+                              xuint32_t                     *bits,
 						      int                           rowstride_bytes);
 pixman_image_t *pixman_image_create_bits_no_clear    (pixman_format_code_t format,
 						      int                  width,
 						      int                  height,
-						      uint32_t *           bits,
+                              xuint32_t *           bits,
 						      int                  rowstride_bytes);
 
 /* Destructor */
@@ -815,8 +799,8 @@ void		pixman_image_set_source_clipping     (pixman_image_t		   *image,
 						      pixman_bool_t                 source_clipping);
 void            pixman_image_set_alpha_map           (pixman_image_t               *image,
 						      pixman_image_t               *alpha_map,
-						      int16_t                       x,
-						      int16_t                       y);
+                              xint16_t                       x,
+                              xint16_t                       y);
 void            pixman_image_set_component_alpha     (pixman_image_t               *image,
 						      pixman_bool_t                 component_alpha);
 pixman_bool_t   pixman_image_get_component_alpha     (pixman_image_t               *image);
@@ -825,7 +809,7 @@ void		pixman_image_set_accessors	     (pixman_image_t		   *image,
 						      pixman_write_memory_func_t    write_func);
 void		pixman_image_set_indexed	     (pixman_image_t		   *image,
 						      const pixman_indexed_t	   *indexed);
-uint32_t       *pixman_image_get_data                (pixman_image_t               *image);
+xuint32_t       *pixman_image_get_data                (pixman_image_t               *image);
 int		pixman_image_get_width               (pixman_image_t               *image);
 int             pixman_image_get_height              (pixman_image_t               *image);
 int		pixman_image_get_stride              (pixman_image_t               *image); /* in bytes */
@@ -874,38 +858,38 @@ pixman_bool_t pixman_compute_composite_region (pixman_region16_t *region,
 					       pixman_image_t    *src_image,
 					       pixman_image_t    *mask_image,
 					       pixman_image_t    *dest_image,
-					       int16_t            src_x,
-					       int16_t            src_y,
-					       int16_t            mask_x,
-					       int16_t            mask_y,
-					       int16_t            dest_x,
-					       int16_t            dest_y,
-					       uint16_t           width,
-					       uint16_t           height);
+                           xint16_t            src_x,
+                           xint16_t            src_y,
+                           xint16_t            mask_x,
+                           xint16_t            mask_y,
+                           xint16_t            dest_x,
+                           xint16_t            dest_y,
+                           xuint16_t           width,
+                           xuint16_t           height);
 void          pixman_image_composite          (pixman_op_t        op,
 					       pixman_image_t    *src,
 					       pixman_image_t    *mask,
 					       pixman_image_t    *dest,
-					       int16_t            src_x,
-					       int16_t            src_y,
-					       int16_t            mask_x,
-					       int16_t            mask_y,
-					       int16_t            dest_x,
-					       int16_t            dest_y,
-					       uint16_t           width,
-					       uint16_t           height);
+                           xint16_t            src_x,
+                           xint16_t            src_y,
+                           xint16_t            mask_x,
+                           xint16_t            mask_y,
+                           xint16_t            dest_x,
+                           xint16_t            dest_y,
+                           xuint16_t           width,
+                           xuint16_t           height);
 void          pixman_image_composite32        (pixman_op_t        op,
 					       pixman_image_t    *src,
 					       pixman_image_t    *mask,
 					       pixman_image_t    *dest,
-					       int32_t            src_x,
-					       int32_t            src_y,
-					       int32_t            mask_x,
-					       int32_t            mask_y,
-					       int32_t            dest_x,
-					       int32_t            dest_y,
-					       int32_t            width,
-					       int32_t            height);
+                           xint32_t            src_x,
+                           xint32_t            src_y,
+                           xint32_t            mask_x,
+                           xint32_t            mask_y,
+                           xint32_t            dest_x,
+                           xint32_t            dest_y,
+                           xint32_t            width,
+                           xint32_t            height);
 
 /* Executive Summary: This function is a no-op that only exists
  * for historical reasons.
@@ -964,24 +948,24 @@ void                  pixman_composite_glyphs         (pixman_op_t           op,
 						       pixman_image_t       *src,
 						       pixman_image_t       *dest,
 						       pixman_format_code_t  mask_format,
-						       int32_t               src_x,
-						       int32_t               src_y,
-						       int32_t		     mask_x,
-						       int32_t		     mask_y,
-						       int32_t               dest_x,
-						       int32_t               dest_y,
-						       int32_t		     width,
-						       int32_t		     height,
+                               xint32_t               src_x,
+                               xint32_t               src_y,
+                               xint32_t		     mask_x,
+                               xint32_t		     mask_y,
+                               xint32_t               dest_x,
+                               xint32_t               dest_y,
+                               xint32_t		     width,
+                               xint32_t		     height,
 						       pixman_glyph_cache_t *cache,
 						       int		     n_glyphs,
 						       const pixman_glyph_t *glyphs);
 void                  pixman_composite_glyphs_no_mask (pixman_op_t           op,
 						       pixman_image_t       *src,
 						       pixman_image_t       *dest,
-						       int32_t               src_x,
-						       int32_t               src_y,
-						       int32_t               dest_x,
-						       int32_t               dest_y,
+                               xint32_t               src_x,
+                               xint32_t               src_y,
+                               xint32_t               dest_x,
+                               xint32_t               dest_y,
 						       pixman_glyph_cache_t *cache,
 						       int		     n_glyphs,
 						       const pixman_glyph_t *glyphs);
@@ -1067,12 +1051,12 @@ void           pixman_rasterize_edges      (pixman_image_t            *image,
 					    pixman_fixed_t             t,
 					    pixman_fixed_t             b);
 void           pixman_add_traps            (pixman_image_t            *image,
-					    int16_t                    x_off,
-					    int16_t                    y_off,
+                        xint16_t                    x_off,
+                        xint16_t                    y_off,
 					    int                        ntrap,
 					    const pixman_trap_t       *traps);
 void           pixman_add_trapezoids       (pixman_image_t            *image,
-					    int16_t                    x_off,
+                        xint16_t                    x_off,
 					    int                        y_off,
 					    int                        ntraps,
 					    const pixman_trapezoid_t  *traps);
@@ -1101,8 +1085,8 @@ void          pixman_composite_triangles (pixman_op_t		       op,
 					  int			       n_tris,
 					  const pixman_triangle_t *    tris);
 void	      pixman_add_triangles       (pixman_image_t              *image,
-					  int32_t	               x_off,
-					  int32_t	               y_off,
+                      xint32_t	               x_off,
+                      xint32_t	               y_off,
 					  int	                       n_tris,
 					  const pixman_triangle_t     *tris);
 

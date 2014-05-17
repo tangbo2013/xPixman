@@ -30,171 +30,171 @@
 #include <config.h>
 #endif
 
-#include <string.h>
+#include <xClib/string.h>
 #include "pixman-private.h"
 #include "pixman-arm-common.h"
 
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, src_8888_8888,
-                                   uint32_t, 1, uint32_t, 1)
+                                   xuint32_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, src_x888_8888,
-                                   uint32_t, 1, uint32_t, 1)
+                                   xuint32_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, src_0565_0565,
-                                   uint16_t, 1, uint16_t, 1)
+                                   xuint16_t, 1, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, src_0888_0888,
-                                   uint8_t, 3, uint8_t, 3)
+                                   xuint8_t, 3, xuint8_t, 3)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, src_8888_0565,
-                                   uint32_t, 1, uint16_t, 1)
+                                   xuint32_t, 1, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, src_0565_8888,
-                                   uint16_t, 1, uint32_t, 1)
+                                   xuint16_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, src_0888_8888_rev,
-                                   uint8_t, 3, uint32_t, 1)
+                                   xuint8_t, 3, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, src_0888_0565_rev,
-                                   uint8_t, 3, uint16_t, 1)
+                                   xuint8_t, 3, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, src_pixbuf_8888,
-                                   uint32_t, 1, uint32_t, 1)
+                                   xuint32_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, src_rpixbuf_8888,
-                                   uint32_t, 1, uint32_t, 1)
+                                   xuint32_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, add_8_8,
-                                   uint8_t, 1, uint8_t, 1)
+                                   xuint8_t, 1, xuint8_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, add_8888_8888,
-                                   uint32_t, 1, uint32_t, 1)
+                                   xuint32_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, over_8888_0565,
-                                   uint32_t, 1, uint16_t, 1)
+                                   xuint32_t, 1, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, over_8888_8888,
-                                   uint32_t, 1, uint32_t, 1)
+                                   xuint32_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, out_reverse_8_0565,
-                                   uint8_t, 1, uint16_t, 1)
+                                   xuint8_t, 1, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_DST (neon, out_reverse_8_8888,
-                                   uint8_t, 1, uint32_t, 1)
+                                   xuint8_t, 1, xuint32_t, 1)
 
 PIXMAN_ARM_BIND_FAST_PATH_N_DST (SKIP_ZERO_SRC, neon, over_n_0565,
-                                 uint16_t, 1)
+                                 xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_DST (SKIP_ZERO_SRC, neon, over_n_8888,
-                                 uint32_t, 1)
+                                 xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_DST (SKIP_ZERO_SRC, neon, over_reverse_n_8888,
-                                 uint32_t, 1)
+                                 xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_DST (0, neon, in_n_8,
-                                 uint8_t, 1)
+                                 xuint8_t, 1)
 
 PIXMAN_ARM_BIND_FAST_PATH_N_MASK_DST (SKIP_ZERO_SRC, neon, over_n_8_0565,
-                                      uint8_t, 1, uint16_t, 1)
+                                      xuint8_t, 1, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_MASK_DST (SKIP_ZERO_SRC, neon, over_n_8_8888,
-                                      uint8_t, 1, uint32_t, 1)
+                                      xuint8_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_MASK_DST (SKIP_ZERO_SRC, neon, over_n_8888_8888_ca,
-                                      uint32_t, 1, uint32_t, 1)
+                                      xuint32_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_MASK_DST (SKIP_ZERO_SRC, neon, over_n_8888_0565_ca,
-				      uint32_t, 1, uint16_t, 1)
+				      xuint32_t, 1, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_MASK_DST (SKIP_ZERO_SRC, neon, over_n_8_8,
-                                      uint8_t, 1, uint8_t, 1)
+                                      xuint8_t, 1, xuint8_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_MASK_DST (SKIP_ZERO_SRC, neon, add_n_8_8,
-                                      uint8_t, 1, uint8_t, 1)
+                                      xuint8_t, 1, xuint8_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_MASK_DST (SKIP_ZERO_SRC, neon, add_n_8_8888,
-                                      uint8_t, 1, uint32_t, 1)
+                                      xuint8_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_MASK_DST (0, neon, src_n_8_8888,
-                                      uint8_t, 1, uint32_t, 1)
+                                      xuint8_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_N_MASK_DST (0, neon, src_n_8_8,
-                                      uint8_t, 1, uint8_t, 1)
+                                      xuint8_t, 1, xuint8_t, 1)
 
 PIXMAN_ARM_BIND_FAST_PATH_SRC_N_DST (SKIP_ZERO_MASK, neon, over_8888_n_8888,
-                                     uint32_t, 1, uint32_t, 1)
+                                     xuint32_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_N_DST (SKIP_ZERO_MASK, neon, over_8888_n_0565,
-                                     uint32_t, 1, uint16_t, 1)
+                                     xuint32_t, 1, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_N_DST (SKIP_ZERO_MASK, neon, over_0565_n_0565,
-                                     uint16_t, 1, uint16_t, 1)
+                                     xuint16_t, 1, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_N_DST (SKIP_ZERO_MASK, neon, add_8888_n_8888,
-                                     uint32_t, 1, uint32_t, 1)
+                                     xuint32_t, 1, xuint32_t, 1)
 
 PIXMAN_ARM_BIND_FAST_PATH_SRC_MASK_DST (neon, add_8_8_8,
-                                        uint8_t, 1, uint8_t, 1, uint8_t, 1)
+                                        xuint8_t, 1, xuint8_t, 1, xuint8_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_MASK_DST (neon, add_0565_8_0565,
-                                        uint16_t, 1, uint8_t, 1, uint16_t, 1)
+                                        xuint16_t, 1, xuint8_t, 1, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_MASK_DST (neon, add_8888_8_8888,
-                                        uint32_t, 1, uint8_t, 1, uint32_t, 1)
+                                        xuint32_t, 1, xuint8_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_MASK_DST (neon, add_8888_8888_8888,
-                                        uint32_t, 1, uint32_t, 1, uint32_t, 1)
+                                        xuint32_t, 1, xuint32_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_MASK_DST (neon, over_8888_8_8888,
-                                        uint32_t, 1, uint8_t, 1, uint32_t, 1)
+                                        xuint32_t, 1, xuint8_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_MASK_DST (neon, over_8888_8888_8888,
-                                        uint32_t, 1, uint32_t, 1, uint32_t, 1)
+                                        xuint32_t, 1, xuint32_t, 1, xuint32_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_MASK_DST (neon, over_8888_8_0565,
-                                        uint32_t, 1, uint8_t, 1, uint16_t, 1)
+                                        xuint32_t, 1, xuint8_t, 1, xuint16_t, 1)
 PIXMAN_ARM_BIND_FAST_PATH_SRC_MASK_DST (neon, over_0565_8_0565,
-                                        uint16_t, 1, uint8_t, 1, uint16_t, 1)
+                                        xuint16_t, 1, xuint8_t, 1, xuint16_t, 1)
 
 PIXMAN_ARM_BIND_SCALED_NEAREST_SRC_DST (neon, 8888_8888, OVER,
-                                        uint32_t, uint32_t)
+                                        xuint32_t, xuint32_t)
 PIXMAN_ARM_BIND_SCALED_NEAREST_SRC_DST (neon, 8888_0565, OVER,
-                                        uint32_t, uint16_t)
+                                        xuint32_t, xuint16_t)
 PIXMAN_ARM_BIND_SCALED_NEAREST_SRC_DST (neon, 8888_0565, SRC,
-                                        uint32_t, uint16_t)
+                                        xuint32_t, xuint16_t)
 PIXMAN_ARM_BIND_SCALED_NEAREST_SRC_DST (neon, 0565_8888, SRC,
-                                        uint16_t, uint32_t)
+                                        xuint16_t, xuint32_t)
 
 PIXMAN_ARM_BIND_SCALED_NEAREST_SRC_A8_DST (SKIP_ZERO_SRC, neon, 8888_8_0565,
-                                           OVER, uint32_t, uint16_t)
+                                           OVER, xuint32_t, xuint16_t)
 PIXMAN_ARM_BIND_SCALED_NEAREST_SRC_A8_DST (SKIP_ZERO_SRC, neon, 0565_8_0565,
-                                           OVER, uint16_t, uint16_t)
+                                           OVER, xuint16_t, xuint16_t)
 
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_DST (0, neon, 8888_8888, SRC,
-                                         uint32_t, uint32_t)
+                                         xuint32_t, xuint32_t)
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_DST (0, neon, 8888_0565, SRC,
-                                         uint32_t, uint16_t)
+                                         xuint32_t, xuint16_t)
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_DST (0, neon, 0565_x888, SRC,
-                                         uint16_t, uint32_t)
+                                         xuint16_t, xuint32_t)
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_DST (0, neon, 0565_0565, SRC,
-                                         uint16_t, uint16_t)
+                                         xuint16_t, xuint16_t)
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_DST (SKIP_ZERO_SRC, neon, 8888_8888, OVER,
-                                         uint32_t, uint32_t)
+                                         xuint32_t, xuint32_t)
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_DST (SKIP_ZERO_SRC, neon, 8888_8888, ADD,
-                                         uint32_t, uint32_t)
+                                         xuint32_t, xuint32_t)
 
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_A8_DST (0, neon, 8888_8_8888, SRC,
-                                            uint32_t, uint32_t)
+                                            xuint32_t, xuint32_t)
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_A8_DST (0, neon, 8888_8_0565, SRC,
-                                            uint32_t, uint16_t)
+                                            xuint32_t, xuint16_t)
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_A8_DST (0, neon, 0565_8_x888, SRC,
-                                            uint16_t, uint32_t)
+                                            xuint16_t, xuint32_t)
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_A8_DST (0, neon, 0565_8_0565, SRC,
-                                            uint16_t, uint16_t)
+                                            xuint16_t, xuint16_t)
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_A8_DST (SKIP_ZERO_SRC, neon, 8888_8_8888, OVER,
-                                            uint32_t, uint32_t)
+                                            xuint32_t, xuint32_t)
 PIXMAN_ARM_BIND_SCALED_BILINEAR_SRC_A8_DST (SKIP_ZERO_SRC, neon, 8888_8_8888, ADD,
-                                            uint32_t, uint32_t)
+                                            xuint32_t, xuint32_t)
 
 void
-pixman_composite_src_n_8_asm_neon (int32_t   w,
-                                   int32_t   h,
-                                   uint8_t  *dst,
-                                   int32_t   dst_stride,
-                                   uint8_t   src);
+pixman_composite_src_n_8_asm_neon (xint32_t   w,
+                                   xint32_t   h,
+                                   xuint8_t  *dst,
+                                   xint32_t   dst_stride,
+                                   xuint8_t   src);
 
 void
-pixman_composite_src_n_0565_asm_neon (int32_t   w,
-                                      int32_t   h,
-                                      uint16_t *dst,
-                                      int32_t   dst_stride,
-                                      uint16_t  src);
+pixman_composite_src_n_0565_asm_neon (xint32_t   w,
+                                      xint32_t   h,
+                                      xuint16_t *dst,
+                                      xint32_t   dst_stride,
+                                      xuint16_t  src);
 
 void
-pixman_composite_src_n_8888_asm_neon (int32_t   w,
-                                      int32_t   h,
-                                      uint32_t *dst,
-                                      int32_t   dst_stride,
-                                      uint32_t  src);
+pixman_composite_src_n_8888_asm_neon (xint32_t   w,
+                                      xint32_t   h,
+                                      xuint32_t *dst,
+                                      xint32_t   dst_stride,
+                                      xuint32_t  src);
 
 static pixman_bool_t
 arm_neon_fill (pixman_implementation_t *imp,
-               uint32_t *               bits,
+               xuint32_t *               bits,
                int                      stride,
                int                      bpp,
                int                      x,
                int                      y,
                int                      width,
                int                      height,
-	       uint32_t                 _xor)
+	       xuint32_t                 _xor)
 {
     /* stride is always multiple of 32bit units in pixman */
-    uint32_t byte_stride = stride * sizeof(uint32_t);
+    xuint32_t byte_stride = stride * sizeof(xuint32_t);
 
     switch (bpp)
     {
@@ -202,7 +202,7 @@ arm_neon_fill (pixman_implementation_t *imp,
 	pixman_composite_src_n_8_asm_neon (
 		width,
 		height,
-		(uint8_t *)(((char *) bits) + y * byte_stride + x),
+		(xuint8_t *)(((char *) bits) + y * byte_stride + x),
 		byte_stride,
 		_xor & 0xff);
 	return TRUE;
@@ -210,7 +210,7 @@ arm_neon_fill (pixman_implementation_t *imp,
 	pixman_composite_src_n_0565_asm_neon (
 		width,
 		height,
-		(uint16_t *)(((char *) bits) + y * byte_stride + x * 2),
+		(xuint16_t *)(((char *) bits) + y * byte_stride + x * 2),
 		byte_stride / 2,
 		_xor & 0xffff);
 	return TRUE;
@@ -218,7 +218,7 @@ arm_neon_fill (pixman_implementation_t *imp,
 	pixman_composite_src_n_8888_asm_neon (
 		width,
 		height,
-		(uint32_t *)(((char *) bits) + y * byte_stride + x * 4),
+		(xuint32_t *)(((char *) bits) + y * byte_stride + x * 4),
 		byte_stride / 4,
 		_xor);
 	return TRUE;
@@ -229,8 +229,8 @@ arm_neon_fill (pixman_implementation_t *imp,
 
 static pixman_bool_t
 arm_neon_blt (pixman_implementation_t *imp,
-              uint32_t *               src_bits,
-              uint32_t *               dst_bits,
+              xuint32_t *               src_bits,
+              xuint32_t *               dst_bits,
               int                      src_stride,
               int                      dst_stride,
               int                      src_bpp,
@@ -250,17 +250,17 @@ arm_neon_blt (pixman_implementation_t *imp,
     case 16:
 	pixman_composite_src_0565_0565_asm_neon (
 		width, height,
-		(uint16_t *)(((char *) dst_bits) +
+		(xuint16_t *)(((char *) dst_bits) +
 		dest_y * dst_stride * 4 + dest_x * 2), dst_stride * 2,
-		(uint16_t *)(((char *) src_bits) +
+		(xuint16_t *)(((char *) src_bits) +
 		src_y * src_stride * 4 + src_x * 2), src_stride * 2);
 	return TRUE;
     case 32:
 	pixman_composite_src_8888_8888_asm_neon (
 		width, height,
-		(uint32_t *)(((char *) dst_bits) +
+		(xuint32_t *)(((char *) dst_bits) +
 		dest_y * dst_stride * 4 + dest_x * 4), dst_stride,
-		(uint32_t *)(((char *) src_bits) +
+		(xuint32_t *)(((char *) src_bits) +
 		src_y * src_stride * 4 + src_x * 4), src_stride);
 	return TRUE;
     default:
@@ -426,22 +426,22 @@ static const pixman_fast_path_t arm_neon_fast_paths[] =
 
 #define BIND_COMBINE_U(name)                                             \
 void                                                                     \
-pixman_composite_scanline_##name##_mask_asm_neon (int32_t         w,     \
-                                                  const uint32_t *dst,   \
-                                                  const uint32_t *src,   \
-                                                  const uint32_t *mask); \
+pixman_composite_scanline_##name##_mask_asm_neon (xint32_t         w,     \
+                                                  const xuint32_t *dst,   \
+                                                  const xuint32_t *src,   \
+                                                  const xuint32_t *mask); \
                                                                          \
 void                                                                     \
-pixman_composite_scanline_##name##_asm_neon (int32_t         w,          \
-                                             const uint32_t *dst,        \
-                                             const uint32_t *src);       \
+pixman_composite_scanline_##name##_asm_neon (xint32_t         w,          \
+                                             const xuint32_t *dst,        \
+                                             const xuint32_t *src);       \
                                                                          \
 static void                                                              \
 neon_combine_##name##_u (pixman_implementation_t *imp,                   \
                          pixman_op_t              op,                    \
-                         uint32_t *               dest,                  \
-                         const uint32_t *         src,                   \
-                         const uint32_t *         mask,                  \
+                         xuint32_t *               dest,                  \
+                         const xuint32_t *         src,                   \
+                         const xuint32_t *         mask,                  \
                          int                      width)                 \
 {                                                                        \
     if (mask)                                                            \

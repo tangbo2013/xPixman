@@ -54,12 +54,12 @@
                                           src_type, src_cnt,            \
                                           dst_type, dst_cnt)            \
 void                                                                    \
-pixman_composite_##name##_asm_##cputype (int32_t   w,                   \
-                                         int32_t   h,                   \
+pixman_composite_##name##_asm_##cputype (xint32_t   w,                   \
+                                         xint32_t   h,                   \
                                          dst_type *dst,                 \
-                                         int32_t   dst_stride,          \
+                                         xint32_t   dst_stride,          \
                                          src_type *src,                 \
-                                         int32_t   src_stride);         \
+                                         xint32_t   src_stride);         \
                                                                         \
 static void                                                             \
 cputype##_composite_##name (pixman_implementation_t *imp,               \
@@ -68,7 +68,7 @@ cputype##_composite_##name (pixman_implementation_t *imp,               \
     PIXMAN_COMPOSITE_ARGS (info);                                       \
     dst_type *dst_line;							\
     src_type *src_line;                                                 \
-    int32_t dst_stride, src_stride;                                     \
+    xint32_t dst_stride, src_stride;                                     \
                                                                         \
     PIXMAN_IMAGE_GET_LINE (src_image, src_x, src_y, src_type,           \
                            src_stride, src_line, src_cnt);              \
@@ -83,11 +83,11 @@ cputype##_composite_##name (pixman_implementation_t *imp,               \
 #define PIXMAN_ARM_BIND_FAST_PATH_N_DST(flags, cputype, name,           \
                                         dst_type, dst_cnt)              \
 void                                                                    \
-pixman_composite_##name##_asm_##cputype (int32_t    w,                  \
-                                         int32_t    h,                  \
+pixman_composite_##name##_asm_##cputype (xint32_t    w,                  \
+                                         xint32_t    h,                  \
                                          dst_type  *dst,                \
-                                         int32_t    dst_stride,         \
-                                         uint32_t   src);               \
+                                         xint32_t    dst_stride,         \
+                                         xuint32_t   src);               \
                                                                         \
 static void                                                             \
 cputype##_composite_##name (pixman_implementation_t *imp,               \
@@ -95,8 +95,8 @@ cputype##_composite_##name (pixman_implementation_t *imp,               \
 {                                                                       \
     PIXMAN_COMPOSITE_ARGS (info);					\
     dst_type  *dst_line;                                                \
-    int32_t    dst_stride;                                              \
-    uint32_t   src;                                                     \
+    xint32_t    dst_stride;                                              \
+    xuint32_t   src;                                                     \
                                                                         \
     src = _pixman_image_get_solid (					\
 	imp, src_image, dest_image->bits.format);			\
@@ -116,14 +116,14 @@ cputype##_composite_##name (pixman_implementation_t *imp,               \
                                              mask_type, mask_cnt,       \
                                              dst_type, dst_cnt)         \
 void                                                                    \
-pixman_composite_##name##_asm_##cputype (int32_t    w,                  \
-                                         int32_t    h,                  \
+pixman_composite_##name##_asm_##cputype (xint32_t    w,                  \
+                                         xint32_t    h,                  \
                                          dst_type  *dst,                \
-                                         int32_t    dst_stride,         \
-                                         uint32_t   src,                \
-                                         int32_t    unused,             \
+                                         xint32_t    dst_stride,         \
+                                         xuint32_t   src,                \
+                                         xint32_t    unused,             \
                                          mask_type *mask,               \
-                                         int32_t    mask_stride);       \
+                                         xint32_t    mask_stride);       \
                                                                         \
 static void                                                             \
 cputype##_composite_##name (pixman_implementation_t *imp,               \
@@ -132,8 +132,8 @@ cputype##_composite_##name (pixman_implementation_t *imp,               \
     PIXMAN_COMPOSITE_ARGS (info);                                       \
     dst_type  *dst_line;						\
     mask_type *mask_line;                                               \
-    int32_t    dst_stride, mask_stride;                                 \
-    uint32_t   src;                                                     \
+    xint32_t    dst_stride, mask_stride;                                 \
+    xuint32_t   src;                                                     \
                                                                         \
     src = _pixman_image_get_solid (					\
 	imp, src_image, dest_image->bits.format);			\
@@ -156,13 +156,13 @@ cputype##_composite_##name (pixman_implementation_t *imp,               \
                                             src_type, src_cnt,          \
                                             dst_type, dst_cnt)          \
 void                                                                    \
-pixman_composite_##name##_asm_##cputype (int32_t    w,                  \
-                                         int32_t    h,                  \
+pixman_composite_##name##_asm_##cputype (xint32_t    w,                  \
+                                         xint32_t    h,                  \
                                          dst_type  *dst,                \
-                                         int32_t    dst_stride,         \
+                                         xint32_t    dst_stride,         \
                                          src_type  *src,                \
-                                         int32_t    src_stride,         \
-                                         uint32_t   mask);              \
+                                         xint32_t    src_stride,         \
+                                         xuint32_t   mask);              \
                                                                         \
 static void                                                             \
 cputype##_composite_##name (pixman_implementation_t *imp,               \
@@ -171,8 +171,8 @@ cputype##_composite_##name (pixman_implementation_t *imp,               \
     PIXMAN_COMPOSITE_ARGS (info);                                       \
     dst_type  *dst_line;						\
     src_type  *src_line;                                                \
-    int32_t    dst_stride, src_stride;                                  \
-    uint32_t   mask;                                                    \
+    xint32_t    dst_stride, src_stride;                                  \
+    xuint32_t   mask;                                                    \
                                                                         \
     mask = _pixman_image_get_solid (					\
 	imp, mask_image, dest_image->bits.format);			\
@@ -196,14 +196,14 @@ cputype##_composite_##name (pixman_implementation_t *imp,               \
                                                mask_type, mask_cnt,     \
                                                dst_type, dst_cnt)       \
 void                                                                    \
-pixman_composite_##name##_asm_##cputype (int32_t    w,                  \
-                                         int32_t    h,                  \
+pixman_composite_##name##_asm_##cputype (xint32_t    w,                  \
+                                         xint32_t    h,                  \
                                          dst_type  *dst,                \
-                                         int32_t    dst_stride,         \
+                                         xint32_t    dst_stride,         \
                                          src_type  *src,                \
-                                         int32_t    src_stride,         \
+                                         xint32_t    src_stride,         \
                                          mask_type *mask,               \
-                                         int32_t    mask_stride);       \
+                                         xint32_t    mask_stride);       \
                                                                         \
 static void                                                             \
 cputype##_composite_##name (pixman_implementation_t *imp,               \
@@ -213,7 +213,7 @@ cputype##_composite_##name (pixman_implementation_t *imp,               \
     dst_type  *dst_line;						\
     src_type  *src_line;                                                \
     mask_type *mask_line;                                               \
-    int32_t    dst_stride, src_stride, mask_stride;                     \
+    xint32_t    dst_stride, src_stride, mask_stride;                     \
                                                                         \
     PIXMAN_IMAGE_GET_LINE (dest_image, dest_x, dest_y, dst_type,        \
                            dst_stride, dst_line, dst_cnt);              \
@@ -232,7 +232,7 @@ cputype##_composite_##name (pixman_implementation_t *imp,               \
                                                src_type, dst_type)            \
 void                                                                          \
 pixman_scaled_nearest_scanline_##name##_##op##_asm_##cputype (                \
-                                                   int32_t          w,        \
+                                                   xint32_t          w,        \
                                                    dst_type *       dst,      \
                                                    const src_type * src,      \
                                                    pixman_fixed_t   vx,       \
@@ -242,7 +242,7 @@ pixman_scaled_nearest_scanline_##name##_##op##_asm_##cputype (                \
 static force_inline void                                                      \
 scaled_nearest_scanline_##cputype##_##name##_##op (dst_type *       pd,       \
                                                    const src_type * ps,       \
-                                                   int32_t          w,        \
+                                                   xint32_t          w,        \
                                                    pixman_fixed_t   vx,       \
                                                    pixman_fixed_t   unit_x,   \
                                                    pixman_fixed_t   max_vx,   \
@@ -277,19 +277,19 @@ FAST_NEAREST_MAINLOOP (cputype##_##name##_normal_##op,                        \
                                                   src_type, dst_type)         \
 void                                                                          \
 pixman_scaled_nearest_scanline_##name##_##op##_asm_##cputype (                \
-                                                   int32_t          w,        \
+                                                   xint32_t          w,        \
                                                    dst_type *       dst,      \
                                                    const src_type * src,      \
                                                    pixman_fixed_t   vx,       \
                                                    pixman_fixed_t   unit_x,   \
                                                    pixman_fixed_t   max_vx,   \
-                                                   const uint8_t *  mask);    \
+                                                   const xuint8_t *  mask);    \
                                                                               \
 static force_inline void                                                      \
-scaled_nearest_scanline_##cputype##_##name##_##op (const uint8_t *  mask,     \
+scaled_nearest_scanline_##cputype##_##name##_##op (const xuint8_t *  mask,     \
                                                    dst_type *       pd,       \
                                                    const src_type * ps,       \
-                                                   int32_t          w,        \
+                                                   xint32_t          w,        \
                                                    pixman_fixed_t   vx,       \
                                                    pixman_fixed_t   unit_x,   \
                                                    pixman_fixed_t   max_vx,   \
@@ -305,16 +305,16 @@ scaled_nearest_scanline_##cputype##_##name##_##op (const uint8_t *  mask,     \
                                                                               \
 FAST_NEAREST_MAINLOOP_COMMON (cputype##_##name##_cover_##op,                  \
                               scaled_nearest_scanline_##cputype##_##name##_##op,\
-                              src_type, uint8_t, dst_type, COVER, TRUE, FALSE)\
+                              src_type, xuint8_t, dst_type, COVER, TRUE, FALSE)\
 FAST_NEAREST_MAINLOOP_COMMON (cputype##_##name##_none_##op,                   \
                               scaled_nearest_scanline_##cputype##_##name##_##op,\
-                              src_type, uint8_t, dst_type, NONE, TRUE, FALSE) \
+                              src_type, xuint8_t, dst_type, NONE, TRUE, FALSE) \
 FAST_NEAREST_MAINLOOP_COMMON (cputype##_##name##_pad_##op,                    \
                               scaled_nearest_scanline_##cputype##_##name##_##op,\
-                              src_type, uint8_t, dst_type, PAD, TRUE, FALSE)  \
+                              src_type, xuint8_t, dst_type, PAD, TRUE, FALSE)  \
 FAST_NEAREST_MAINLOOP_COMMON (cputype##_##name##_normal_##op,                 \
                               scaled_nearest_scanline_##cputype##_##name##_##op,\
-                              src_type, uint8_t, dst_type, NORMAL, TRUE, FALSE)
+                              src_type, xuint8_t, dst_type, NORMAL, TRUE, FALSE)
 
 /* Provide entries for the fast path table */
 #define PIXMAN_ARM_SIMPLE_NEAREST_A8_MASK_FAST_PATH(op,s,d,func)              \
@@ -341,10 +341,10 @@ pixman_scaled_bilinear_scanline_##name##_##op##_asm_##cputype (               \
 static force_inline void                                                      \
 scaled_bilinear_scanline_##cputype##_##name##_##op (                          \
                                                 dst_type *       dst,         \
-                                                const uint32_t * mask,        \
+                                                const xuint32_t * mask,        \
                                                 const src_type * src_top,     \
                                                 const src_type * src_bottom,  \
-                                                int32_t          w,           \
+                                                xint32_t          w,           \
                                                 int              wt,          \
                                                 int              wb,          \
                                                 pixman_fixed_t   vx,          \
@@ -360,16 +360,16 @@ scaled_bilinear_scanline_##cputype##_##name##_##op (                          \
                                                                               \
 FAST_BILINEAR_MAINLOOP_COMMON (cputype##_##name##_cover_##op,                 \
                        scaled_bilinear_scanline_##cputype##_##name##_##op,    \
-                       src_type, uint32_t, dst_type, COVER, FLAG_NONE)        \
+                       src_type, xuint32_t, dst_type, COVER, FLAG_NONE)        \
 FAST_BILINEAR_MAINLOOP_COMMON (cputype##_##name##_none_##op,                  \
                        scaled_bilinear_scanline_##cputype##_##name##_##op,    \
-                       src_type, uint32_t, dst_type, NONE, FLAG_NONE)         \
+                       src_type, xuint32_t, dst_type, NONE, FLAG_NONE)         \
 FAST_BILINEAR_MAINLOOP_COMMON (cputype##_##name##_pad_##op,                   \
                        scaled_bilinear_scanline_##cputype##_##name##_##op,    \
-                       src_type, uint32_t, dst_type, PAD, FLAG_NONE)          \
+                       src_type, xuint32_t, dst_type, PAD, FLAG_NONE)          \
 FAST_BILINEAR_MAINLOOP_COMMON (cputype##_##name##_normal_##op,                \
                        scaled_bilinear_scanline_##cputype##_##name##_##op,    \
-                       src_type, uint32_t, dst_type, NORMAL,                  \
+                       src_type, xuint32_t, dst_type, NORMAL,                  \
                        FLAG_NONE)
 
 
@@ -378,7 +378,7 @@ FAST_BILINEAR_MAINLOOP_COMMON (cputype##_##name##_normal_##op,                \
 void                                                                          \
 pixman_scaled_bilinear_scanline_##name##_##op##_asm_##cputype (               \
                                                 dst_type *       dst,         \
-                                                const uint8_t *  mask,        \
+                                                const xuint8_t *  mask,        \
                                                 const src_type * top,         \
                                                 const src_type * bottom,      \
                                                 int              wt,          \
@@ -390,10 +390,10 @@ pixman_scaled_bilinear_scanline_##name##_##op##_asm_##cputype (               \
 static force_inline void                                                      \
 scaled_bilinear_scanline_##cputype##_##name##_##op (                          \
                                                 dst_type *       dst,         \
-                                                const uint8_t *  mask,        \
+                                                const xuint8_t *  mask,        \
                                                 const src_type * src_top,     \
                                                 const src_type * src_bottom,  \
-                                                int32_t          w,           \
+                                                xint32_t          w,           \
                                                 int              wt,          \
                                                 int              wb,          \
                                                 pixman_fixed_t   vx,          \
@@ -409,19 +409,19 @@ scaled_bilinear_scanline_##cputype##_##name##_##op (                          \
                                                                               \
 FAST_BILINEAR_MAINLOOP_COMMON (cputype##_##name##_cover_##op,                 \
                        scaled_bilinear_scanline_##cputype##_##name##_##op,    \
-                       src_type, uint8_t, dst_type, COVER,                    \
+                       src_type, xuint8_t, dst_type, COVER,                    \
                        FLAG_HAVE_NON_SOLID_MASK)                              \
 FAST_BILINEAR_MAINLOOP_COMMON (cputype##_##name##_none_##op,                  \
                        scaled_bilinear_scanline_##cputype##_##name##_##op,    \
-                       src_type, uint8_t, dst_type, NONE,                     \
+                       src_type, xuint8_t, dst_type, NONE,                     \
                        FLAG_HAVE_NON_SOLID_MASK)                              \
 FAST_BILINEAR_MAINLOOP_COMMON (cputype##_##name##_pad_##op,                   \
                        scaled_bilinear_scanline_##cputype##_##name##_##op,    \
-                       src_type, uint8_t, dst_type, PAD,                      \
+                       src_type, xuint8_t, dst_type, PAD,                      \
                        FLAG_HAVE_NON_SOLID_MASK)                              \
 FAST_BILINEAR_MAINLOOP_COMMON (cputype##_##name##_normal_##op,                \
                        scaled_bilinear_scanline_##cputype##_##name##_##op,    \
-                       src_type, uint8_t, dst_type, NORMAL,                   \
+                       src_type, xuint8_t, dst_type, NORMAL,                   \
                        FLAG_HAVE_NON_SOLID_MASK)
 
 

@@ -185,24 +185,24 @@ _mm_packs_pi32 (__m64 __m1, __m64 __m2)
 #define _MM_SHUFFLE(fp3,fp2,fp1,fp0) \
  (((fp3) << 6) | ((fp2) << 4) | ((fp1) << 2) | (fp0))
 extern __inline __m64 __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_set_pi16 (uint16_t __w3, uint16_t __w2, uint16_t __w1, uint16_t __w0)
+_mm_set_pi16 (xuint16_t __w3, xuint16_t __w2, xuint16_t __w1, xuint16_t __w0)
 {
 	if (__builtin_constant_p (__w3) &&
 	    __builtin_constant_p (__w2) &&
 	    __builtin_constant_p (__w1) &&
 	    __builtin_constant_p (__w0))
 	{
-		uint64_t val = ((uint64_t)__w3 << 48)
-			     | ((uint64_t)__w2 << 32)
-			     | ((uint64_t)__w1 << 16)
-			     | ((uint64_t)__w0 <<  0);
+		xuint64_t val = ((xuint64_t)__w3 << 48)
+			     | ((xuint64_t)__w2 << 32)
+			     | ((xuint64_t)__w1 << 16)
+			     | ((xuint64_t)__w0 <<  0);
 		return *(__m64 *)&val;
 	}
 	else if (__w3 == __w2 && __w2 == __w1 && __w1 == __w0)
 	{
 		/* TODO: handle other cases */
-		uint64_t val = __w3;
-		uint64_t imm = _MM_SHUFFLE (0, 0, 0, 0);
+		xuint64_t val = __w3;
+		xuint64_t imm = _MM_SHUFFLE (0, 0, 0, 0);
 		__m64 ret;
 		asm("pshufh %0, %1, %2\n\t"
 		    : "=f" (ret)
@@ -210,10 +210,10 @@ _mm_set_pi16 (uint16_t __w3, uint16_t __w2, uint16_t __w1, uint16_t __w0)
 		);
 		return ret;
 	}
-	uint64_t val = ((uint64_t)__w3 << 48)
-		     | ((uint64_t)__w2 << 32)
-		     | ((uint64_t)__w1 << 16)
-		     | ((uint64_t)__w0 <<  0);
+	xuint64_t val = ((xuint64_t)__w3 << 48)
+		     | ((xuint64_t)__w2 << 32)
+		     | ((xuint64_t)__w1 << 16)
+		     | ((xuint64_t)__w0 <<  0);
 	return *(__m64 *)&val;
 }
 
@@ -223,13 +223,13 @@ _mm_set_pi32 (unsigned __i1, unsigned __i0)
 	if (__builtin_constant_p (__i1) &&
 	    __builtin_constant_p (__i0))
 	{
-		uint64_t val = ((uint64_t)__i1 << 32)
-			     | ((uint64_t)__i0 <<  0);
+		xuint64_t val = ((xuint64_t)__i1 << 32)
+			     | ((xuint64_t)__i0 <<  0);
 		return *(__m64 *)&val;
 	}
 	else if (__i1 == __i0)
 	{
-		uint64_t imm = _MM_SHUFFLE (1, 0, 1, 0);
+		xuint64_t imm = _MM_SHUFFLE (1, 0, 1, 0);
 		__m64 ret;
 		asm("pshufh %0, %1, %2\n\t"
 		    : "=f" (ret)
@@ -237,14 +237,14 @@ _mm_set_pi32 (unsigned __i1, unsigned __i0)
 		);
 		return ret;
 	}
-	uint64_t val = ((uint64_t)__i1 << 32)
-		     | ((uint64_t)__i0 <<  0);
+	xuint64_t val = ((xuint64_t)__i1 << 32)
+		     | ((xuint64_t)__i0 <<  0);
 	return *(__m64 *)&val;
 }
 #undef _MM_SHUFFLE
 
 extern __inline __m64 __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_shuffle_pi16 (__m64 __m, int64_t __n)
+_mm_shuffle_pi16 (__m64 __m, xint64_t __n)
 {
 	__m64 ret;
 	asm("pshufh %0, %1, %2\n\t"
@@ -255,7 +255,7 @@ _mm_shuffle_pi16 (__m64 __m, int64_t __n)
 }
 
 extern __inline __m64 __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_slli_pi16 (__m64 __m, int64_t __count)
+_mm_slli_pi16 (__m64 __m, xint64_t __count)
 {
 	__m64 ret;
 	asm("psllh  %0, %1, %2\n\t"
@@ -265,7 +265,7 @@ _mm_slli_pi16 (__m64 __m, int64_t __count)
 	return ret;
 }
 extern __inline __m64 __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_slli_si64 (__m64 __m, int64_t __count)
+_mm_slli_si64 (__m64 __m, xint64_t __count)
 {
 	__m64 ret;
 	asm("dsll  %0, %1, %2\n\t"
@@ -276,7 +276,7 @@ _mm_slli_si64 (__m64 __m, int64_t __count)
 }
 
 extern __inline __m64 __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_srli_pi16 (__m64 __m, int64_t __count)
+_mm_srli_pi16 (__m64 __m, xint64_t __count)
 {
 	__m64 ret;
 	asm("psrlh %0, %1, %2\n\t"
@@ -287,7 +287,7 @@ _mm_srli_pi16 (__m64 __m, int64_t __count)
 }
 
 extern __inline __m64 __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_srli_pi32 (__m64 __m, int64_t __count)
+_mm_srli_pi32 (__m64 __m, xint64_t __count)
 {
 	__m64 ret;
 	asm("psrlw %0, %1, %2\n\t"
@@ -298,7 +298,7 @@ _mm_srli_pi32 (__m64 __m, int64_t __count)
 }
 
 extern __inline __m64 __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_srli_si64 (__m64 __m, int64_t __count)
+_mm_srli_si64 (__m64 __m, xint64_t __count)
 {
 	__m64 ret;
 	asm("dsrl  %0, %1, %2\n\t"
@@ -388,7 +388,7 @@ _mm_xor_si64 (__m64 __m1, __m64 __m2)
 }
 
 extern __inline __m64 __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-loongson_extract_pi16 (__m64 __m, int64_t __pos)
+loongson_extract_pi16 (__m64 __m, xint64_t __pos)
 {
 	__m64 ret;
 	asm("pextrh %0, %1, %2\n\t"
@@ -399,7 +399,7 @@ loongson_extract_pi16 (__m64 __m, int64_t __pos)
 }
 
 extern __inline __m64 __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-loongson_insert_pi16 (__m64 __m1, __m64 __m2, int64_t __pos)
+loongson_insert_pi16 (__m64 __m1, __m64 __m2, xint64_t __pos)
 {
 	__m64 ret;
 	asm("pinsrh_%3 %0, %1, %2\n\t"

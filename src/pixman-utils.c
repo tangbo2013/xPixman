@@ -25,13 +25,14 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdio.h>
-#include <stdlib.h>
+
+#include <xC/xdebug.h>
+#include <xC/xmemory.h>
 
 #include "pixman-private.h"
 
 pixman_bool_t
-_pixman_multiply_overflows_size (size_t a, size_t b)
+_pixman_multiply_overflows_size (xsize_t a, xsize_t b)
 {
     return a >= SIZE_MAX / b;
 }
@@ -52,9 +53,9 @@ void *
 pixman_malloc_ab_plus_c (unsigned int a, unsigned int b, unsigned int c)
 {
     if (!b || a >= INT32_MAX / b || (a * b) > INT32_MAX - c)
-	return NULL;
+    return XNULL;
 
-    return malloc (a * b + c);
+    return xmemory_alloc (a * b + c);
 }
 
 void *
@@ -62,9 +63,9 @@ pixman_malloc_ab (unsigned int a,
                   unsigned int b)
 {
     if (a >= INT32_MAX / b)
-	return NULL;
+    return XNULL;
 
-    return malloc (a * b);
+    return xmemory_alloc (a * b);
 }
 
 void *
@@ -73,17 +74,17 @@ pixman_malloc_abc (unsigned int a,
                    unsigned int c)
 {
     if (a >= INT32_MAX / b)
-	return NULL;
+    return XNULL;
     else if (a * b >= INT32_MAX / c)
-	return NULL;
+    return XNULL;
     else
-	return malloc (a * b * c);
+    return xmemory_alloc (a * b * c);
 }
 
-static force_inline uint16_t
+static force_inline xuint16_t
 float_to_unorm (float f, int n_bits)
 {
-    uint32_t u;
+    xuint32_t u;
 
     if (f > 1.0)
 	f = 1.0;
@@ -97,9 +98,9 @@ float_to_unorm (float f, int n_bits)
 }
 
 static force_inline float
-unorm_to_float (uint16_t u, int n_bits)
+unorm_to_float (xuint16_t u, int n_bits)
 {
-    uint32_t m = ((1 << n_bits) - 1);
+    xuint32_t m = ((1 << n_bits) - 1);
 
     return (u & m) * (1.f / (float)m);
 }
@@ -116,7 +117,7 @@ unorm_to_float (uint16_t u, int n_bits)
  */
 void
 pixman_expand_to_float (argb_t               *dst,
-			const uint32_t       *src,
+			const xuint32_t       *src,
 			pixman_format_code_t  format,
 			int                   width)
 {
@@ -141,7 +142,7 @@ pixman_expand_to_float (argb_t               *dst,
     int a_size, r_size, g_size, b_size;
     int a_shift, r_shift, g_shift, b_shift;
     float a_mul, r_mul, g_mul, b_mul;
-    uint32_t a_mask, r_mask, g_mask, b_mask;
+    xuint32_t a_mask, r_mask, g_mask, b_mask;
     int i;
 
     if (!PIXMAN_FORMAT_VIS (format))
@@ -176,7 +177,7 @@ pixman_expand_to_float (argb_t               *dst,
      */
     for (i = width - 1; i >= 0; i--)
     {
-	const uint32_t pixel = src[i];
+	const xuint32_t pixel = src[i];
 
 	dst[i].a = a_mask? ((pixel >> a_shift) & a_mask) * a_mul : 1.0f;
 	dst[i].r = ((pixel >> r_shift) & r_mask) * r_mul;
@@ -185,20 +186,20 @@ pixman_expand_to_float (argb_t               *dst,
     }
 }
 
-uint16_t
+xuint16_t
 pixman_float_to_unorm (float f, int n_bits)
 {
     return float_to_unorm (f, n_bits);
 }
 
 float
-pixman_unorm_to_float (uint16_t u, int n_bits)
+pixman_unorm_to_float (xuint16_t u, int n_bits)
 {
     return unorm_to_float (u, n_bits);
 }
 
 void
-pixman_contract_from_float (uint32_t     *dst,
+pixman_contract_from_float (xuint32_t     *dst,
 			    const argb_t *src,
 			    int           width)
 {
@@ -206,7 +207,7 @@ pixman_contract_from_float (uint32_t     *dst,
 
     for (i = 0; i < width; ++i)
     {
-	uint8_t a, r, g, b;
+	xuint8_t a, r, g, b;
 
 	a = float_to_unorm (src[i].a, 8);
 	r = float_to_unorm (src[i].r, 8);
@@ -217,8 +218,8 @@ pixman_contract_from_float (uint32_t     *dst,
     }
 }
 
-uint32_t *
-_pixman_iter_get_scanline_noop (pixman_iter_t *iter, const uint32_t *mask)
+xuint32_t *
+_pixman_iter_get_scanline_noop (pixman_iter_t *iter, const xuint32_t *mask)
 {
     return iter->buffer;
 }
@@ -227,7 +228,7 @@ void
 _pixman_iter_init_bits_stride (pixman_iter_t *iter, const pixman_iter_info_t *info)
 {
     pixman_image_t *image = iter->image;
-    uint8_t *b = (uint8_t *)image->bits.bits;
+    xuint8_t *b = (xuint8_t *)image->bits.bits;
     int s = image->bits.rowstride * 4;
 
     iter->bits = b + s * iter->y + iter->x * PIXMAN_FORMAT_BPP (info->format) / 8;
@@ -262,7 +263,7 @@ pixman_region16_copy_from_region32 (pixman_region16_t *dst,
 
     pixman_region_fini (dst);
     retval = pixman_region_init_rects (dst, boxes16, n_boxes);
-    free (boxes16);
+    xmemory_free (boxes16);
     return retval;
 }
 
@@ -298,7 +299,7 @@ pixman_region32_copy_from_region16 (pixman_region32_t *dst,
     retval = pixman_region32_init_rects (dst, boxes32, n_boxes);
 
     if (boxes32 != tmp_boxes)
-	free (boxes32);
+    xmemory_free (boxes32);
 
     return retval;
 }
@@ -319,10 +320,10 @@ _pixman_log_error (const char *function, const char *message)
 
     if (n_messages < 10)
     {
-	fprintf (stderr,
+    XDBGPRINTF (
 		 "*** BUG ***\n"
 		 "In %s: %s\n"
-		 "Set a breakpoint on '_pixman_log_error' to debug\n\n",
+         "Set a breakpoint on '_pixman_log_error' to debug\n\n",
                  function, message);
 
 	n_messages++;

@@ -28,13 +28,10 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <xC/xmemory.h>
+#include <xClib/math.h>
+#include <xC/xmemory.h>
+#include <xClib/string.h>
 #include "pixman-private.h"
 
 static void
@@ -75,14 +72,14 @@ general_iter_init (pixman_iter_t *iter, const pixman_iter_info_t *info)
 
 static const pixman_iter_info_t general_iters[] =
 {
-    { PIXMAN_any, 0, 0, general_iter_init, NULL, NULL },
+    { PIXMAN_any, 0, 0, general_iter_init, XNULL, XNULL },
     { PIXMAN_null },
 };
 
 typedef struct op_info_t op_info_t;
 struct op_info_t
 {
-    uint8_t src, dst;
+    xuint8_t src, dst;
 };
 
 #define ITER_IGNORE_BOTH						\
@@ -114,9 +111,9 @@ general_composite_rect  (pixman_implementation_t *imp,
                          pixman_composite_info_t *info)
 {
     PIXMAN_COMPOSITE_ARGS (info);
-    uint8_t stack_scanline_buffer[3 * SCANLINE_BUFFER_LENGTH];
-    uint8_t *scanline_buffer = (uint8_t *) stack_scanline_buffer;
-    uint8_t *src_buffer, *mask_buffer, *dest_buffer;
+    xuint8_t stack_scanline_buffer[3 * SCANLINE_BUFFER_LENGTH];
+    xuint8_t *scanline_buffer = (xuint8_t *) stack_scanline_buffer;
+    xuint8_t *src_buffer, *mask_buffer, *dest_buffer;
     pixman_iter_t src_iter, mask_iter, dest_iter;
     pixman_combine_32_func_t compose;
     pixman_bool_t component_alpha;
@@ -138,7 +135,7 @@ general_composite_rect  (pixman_implementation_t *imp,
     }
 
 #define ALIGN(addr)							\
-    ((uint8_t *)((((uintptr_t)(addr)) + 15) & (~15)))
+    ((xuint8_t *)((((xuintptr_t)(addr)) + 15) & (~15)))
 
     src_buffer = ALIGN (scanline_buffer);
     mask_buffer = ALIGN (src_buffer + width * Bpp);
@@ -160,9 +157,9 @@ general_composite_rect  (pixman_implementation_t *imp,
     if (width_flag == ITER_WIDE)
     {
 	/* To make sure there aren't any NANs in the buffers */
-	memset (src_buffer, 0, width * Bpp);
-	memset (mask_buffer, 0, width * Bpp);
-	memset (dest_buffer, 0, width * Bpp);
+    xmemory_set (src_buffer, 0, width * Bpp);
+    xmemory_set (mask_buffer, 0, width * Bpp);
+    xmemory_set (dest_buffer, 0, width * Bpp);
     }
     
     /* src iter */
@@ -180,7 +177,7 @@ general_composite_rect  (pixman_implementation_t *imp,
 	/* If it doesn't matter what the source is, then it doesn't matter
 	 * what the mask is
 	 */
-	mask_image = NULL;
+    mask_image = XNULL;
     }
 
     component_alpha =
@@ -205,11 +202,11 @@ general_composite_rect  (pixman_implementation_t *imp,
 
     for (i = 0; i < height; ++i)
     {
-	uint32_t *s, *m, *d;
+	xuint32_t *s, *m, *d;
 
-	m = mask_iter.get_scanline (&mask_iter, NULL);
+    m = mask_iter.get_scanline (&mask_iter, XNULL);
 	s = src_iter.get_scanline (&src_iter, m);
-	d = dest_iter.get_scanline (&dest_iter, NULL);
+    d = dest_iter.get_scanline (&dest_iter, XNULL);
 
 	compose (imp->toplevel, op, d, s, m, width);
 
@@ -223,8 +220,8 @@ general_composite_rect  (pixman_implementation_t *imp,
     if (dest_iter.fini)
 	dest_iter.fini (&dest_iter);
     
-    if (scanline_buffer != (uint8_t *) stack_scanline_buffer)
-	free (scanline_buffer);
+    if (scanline_buffer != (xuint8_t *) stack_scanline_buffer)
+    xmemory_free (scanline_buffer);
 }
 
 static const pixman_fast_path_t general_fast_path[] =
@@ -236,7 +233,7 @@ static const pixman_fast_path_t general_fast_path[] =
 pixman_implementation_t *
 _pixman_implementation_create_general (void)
 {
-    pixman_implementation_t *imp = _pixman_implementation_create (NULL, general_fast_path);
+    pixman_implementation_t *imp = _pixman_implementation_create (XNULL, general_fast_path);
 
     _pixman_setup_combiner_functions_32 (imp);
     _pixman_setup_combiner_functions_float (imp);

@@ -25,8 +25,8 @@
 #include <config.h>
 #endif
 
-#include <math.h>
-#include <string.h>
+#include <xClib/math.h>
+#include <xClib/string.h>
 
 #include "pixman-private.h"
 #include "pixman-combine32.h"
@@ -34,12 +34,12 @@
 /* component alpha helper functions */
 
 static void
-combine_mask_ca (uint32_t *src, uint32_t *mask)
+combine_mask_ca (xuint32_t *src, xuint32_t *mask)
 {
-    uint32_t a = *mask;
+    xuint32_t a = *mask;
 
-    uint32_t x;
-    uint16_t xa;
+    xuint32_t x;
+    xuint16_t xa;
 
     if (!a)
     {
@@ -66,10 +66,10 @@ combine_mask_ca (uint32_t *src, uint32_t *mask)
 }
 
 static void
-combine_mask_value_ca (uint32_t *src, const uint32_t *mask)
+combine_mask_value_ca (xuint32_t *src, const xuint32_t *mask)
 {
-    uint32_t a = *mask;
-    uint32_t x;
+    xuint32_t a = *mask;
+    xuint32_t x;
 
     if (!a)
     {
@@ -86,10 +86,10 @@ combine_mask_value_ca (uint32_t *src, const uint32_t *mask)
 }
 
 static void
-combine_mask_alpha_ca (const uint32_t *src, uint32_t *mask)
+combine_mask_alpha_ca (const xuint32_t *src, xuint32_t *mask)
 {
-    uint32_t a = *(mask);
-    uint32_t x;
+    xuint32_t a = *(mask);
+    xuint32_t x;
 
     if (!a)
 	return;
@@ -118,10 +118,10 @@ combine_mask_alpha_ca (const uint32_t *src, uint32_t *mask)
  * this difference will have two versions using the same convention.
  */
 
-static force_inline uint32_t
-combine_mask (const uint32_t *src, const uint32_t *mask, int i)
+static force_inline xuint32_t
+combine_mask (const xuint32_t *src, const xuint32_t *mask, int i)
 {
-    uint32_t s, m;
+    xuint32_t s, m;
 
     if (mask)
     {
@@ -142,20 +142,20 @@ combine_mask (const uint32_t *src, const uint32_t *mask, int i)
 static void
 combine_clear (pixman_implementation_t *imp,
                pixman_op_t              op,
-               uint32_t *               dest,
-               const uint32_t *         src,
-               const uint32_t *         mask,
+               xuint32_t *               dest,
+               const xuint32_t *         src,
+               const xuint32_t *         mask,
                int                      width)
 {
-    memset (dest, 0, width * sizeof (uint32_t));
+    xmemory_set (dest, 0, width * sizeof (xuint32_t));
 }
 
 static void
 combine_dst (pixman_implementation_t *imp,
 	     pixman_op_t	      op,
-	     uint32_t *		      dest,
-	     const uint32_t *	      src,
-	     const uint32_t *         mask,
+	     xuint32_t *		      dest,
+	     const xuint32_t *	      src,
+	     const xuint32_t *         mask,
 	     int		      width)
 {
     return;
@@ -164,22 +164,22 @@ combine_dst (pixman_implementation_t *imp,
 static void
 combine_src_u (pixman_implementation_t *imp,
                pixman_op_t              op,
-               uint32_t *               dest,
-               const uint32_t *         src,
-               const uint32_t *         mask,
+               xuint32_t *               dest,
+               const xuint32_t *         src,
+               const xuint32_t *         mask,
                int                      width)
 {
     int i;
 
     if (!mask)
     {
-	memcpy (dest, src, width * sizeof (uint32_t));
+    xmemory_copy (dest, src, width * sizeof (xuint32_t));
     }
     else
     {
 	for (i = 0; i < width; ++i)
 	{
-	    uint32_t s = combine_mask (src, mask, i);
+	    xuint32_t s = combine_mask (src, mask, i);
 
 	    *(dest + i) = s;
 	}
@@ -189,9 +189,9 @@ combine_src_u (pixman_implementation_t *imp,
 static void
 combine_over_u (pixman_implementation_t *imp,
                 pixman_op_t              op,
-                uint32_t *               dest,
-                const uint32_t *         src,
-                const uint32_t *         mask,
+                xuint32_t *               dest,
+                const xuint32_t *         src,
+                const xuint32_t *         mask,
                 int                      width)
 {
     int i;
@@ -200,16 +200,16 @@ combine_over_u (pixman_implementation_t *imp,
     {
 	for (i = 0; i < width; ++i)
 	{
-	    uint32_t s = *(src + i);
-	    uint32_t a = ALPHA_8 (s);
+	    xuint32_t s = *(src + i);
+	    xuint32_t a = ALPHA_8 (s);
 	    if (a == 0xFF)
 	    {
 		*(dest + i) = s;
 	    }
 	    else if (s)
 	    {
-		uint32_t d = *(dest + i);
-		uint32_t ia = a ^ 0xFF;
+		xuint32_t d = *(dest + i);
+		xuint32_t ia = a ^ 0xFF;
 		UN8x4_MUL_UN8_ADD_UN8x4 (d, ia, s);
 		*(dest + i) = d;
 	    }
@@ -219,29 +219,29 @@ combine_over_u (pixman_implementation_t *imp,
     {
 	for (i = 0; i < width; ++i)
 	{
-	    uint32_t m = ALPHA_8 (*(mask + i));
+	    xuint32_t m = ALPHA_8 (*(mask + i));
 	    if (m == 0xFF)
 	    {
-		uint32_t s = *(src + i);
-		uint32_t a = ALPHA_8 (s);
+		xuint32_t s = *(src + i);
+		xuint32_t a = ALPHA_8 (s);
 		if (a == 0xFF)
 		{
 		    *(dest + i) = s;
 		}
 		else if (s)
 		{
-		    uint32_t d = *(dest + i);
-		    uint32_t ia = a ^ 0xFF;
+		    xuint32_t d = *(dest + i);
+		    xuint32_t ia = a ^ 0xFF;
 		    UN8x4_MUL_UN8_ADD_UN8x4 (d, ia, s);
 		    *(dest + i) = d;
 		}
 	    }
 	    else if (m)
 	    {
-		uint32_t s = *(src + i);
+		xuint32_t s = *(src + i);
 		if (s)
 		{
-		    uint32_t d = *(dest + i);
+		    xuint32_t d = *(dest + i);
 		    UN8x4_MUL_UN8 (s, m);
 		    UN8x4_MUL_UN8_ADD_UN8x4 (d, ALPHA_8 (~s), s);
 		    *(dest + i) = d;
@@ -254,18 +254,18 @@ combine_over_u (pixman_implementation_t *imp,
 static void
 combine_over_reverse_u (pixman_implementation_t *imp,
                         pixman_op_t              op,
-                        uint32_t *               dest,
-                        const uint32_t *         src,
-                        const uint32_t *         mask,
+                        xuint32_t *               dest,
+                        const xuint32_t *         src,
+                        const xuint32_t *         mask,
                         int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
-	uint32_t ia = ALPHA_8 (~*(dest + i));
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
+	xuint32_t ia = ALPHA_8 (~*(dest + i));
 	UN8x4_MUL_UN8_ADD_UN8x4 (s, ia, d);
 	*(dest + i) = s;
     }
@@ -274,17 +274,17 @@ combine_over_reverse_u (pixman_implementation_t *imp,
 static void
 combine_in_u (pixman_implementation_t *imp,
               pixman_op_t              op,
-              uint32_t *               dest,
-              const uint32_t *         src,
-              const uint32_t *         mask,
+              xuint32_t *               dest,
+              const xuint32_t *         src,
+              const xuint32_t *         mask,
               int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t a = ALPHA_8 (*(dest + i));
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t a = ALPHA_8 (*(dest + i));
 	UN8x4_MUL_UN8 (s, a);
 	*(dest + i) = s;
     }
@@ -293,18 +293,18 @@ combine_in_u (pixman_implementation_t *imp,
 static void
 combine_in_reverse_u (pixman_implementation_t *imp,
                       pixman_op_t              op,
-                      uint32_t *               dest,
-                      const uint32_t *         src,
-                      const uint32_t *         mask,
+                      xuint32_t *               dest,
+                      const xuint32_t *         src,
+                      const xuint32_t *         mask,
                       int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
-	uint32_t a = ALPHA_8 (s);
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
+	xuint32_t a = ALPHA_8 (s);
 	UN8x4_MUL_UN8 (d, a);
 	*(dest + i) = d;
     }
@@ -313,17 +313,17 @@ combine_in_reverse_u (pixman_implementation_t *imp,
 static void
 combine_out_u (pixman_implementation_t *imp,
                pixman_op_t              op,
-               uint32_t *               dest,
-               const uint32_t *         src,
-               const uint32_t *         mask,
+               xuint32_t *               dest,
+               const xuint32_t *         src,
+               const xuint32_t *         mask,
                int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t a = ALPHA_8 (~*(dest + i));
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t a = ALPHA_8 (~*(dest + i));
 	UN8x4_MUL_UN8 (s, a);
 	*(dest + i) = s;
     }
@@ -332,18 +332,18 @@ combine_out_u (pixman_implementation_t *imp,
 static void
 combine_out_reverse_u (pixman_implementation_t *imp,
                        pixman_op_t              op,
-                       uint32_t *               dest,
-                       const uint32_t *         src,
-                       const uint32_t *         mask,
+                       xuint32_t *               dest,
+                       const xuint32_t *         src,
+                       const xuint32_t *         mask,
                        int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
-	uint32_t a = ALPHA_8 (~s);
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
+	xuint32_t a = ALPHA_8 (~s);
 	UN8x4_MUL_UN8 (d, a);
 	*(dest + i) = d;
     }
@@ -352,19 +352,19 @@ combine_out_reverse_u (pixman_implementation_t *imp,
 static void
 combine_atop_u (pixman_implementation_t *imp,
                 pixman_op_t              op,
-                uint32_t *               dest,
-                const uint32_t *         src,
-                const uint32_t *         mask,
+                xuint32_t *               dest,
+                const xuint32_t *         src,
+                const xuint32_t *         mask,
                 int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
-	uint32_t dest_a = ALPHA_8 (d);
-	uint32_t src_ia = ALPHA_8 (~s);
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
+	xuint32_t dest_a = ALPHA_8 (d);
+	xuint32_t src_ia = ALPHA_8 (~s);
 
 	UN8x4_MUL_UN8_ADD_UN8x4_MUL_UN8 (s, dest_a, d, src_ia);
 	*(dest + i) = s;
@@ -374,19 +374,19 @@ combine_atop_u (pixman_implementation_t *imp,
 static void
 combine_atop_reverse_u (pixman_implementation_t *imp,
                         pixman_op_t              op,
-                        uint32_t *               dest,
-                        const uint32_t *         src,
-                        const uint32_t *         mask,
+                        xuint32_t *               dest,
+                        const xuint32_t *         src,
+                        const xuint32_t *         mask,
                         int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
-	uint32_t src_a = ALPHA_8 (s);
-	uint32_t dest_ia = ALPHA_8 (~d);
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
+	xuint32_t src_a = ALPHA_8 (s);
+	xuint32_t dest_ia = ALPHA_8 (~d);
 
 	UN8x4_MUL_UN8_ADD_UN8x4_MUL_UN8 (s, dest_ia, d, src_a);
 	*(dest + i) = s;
@@ -396,19 +396,19 @@ combine_atop_reverse_u (pixman_implementation_t *imp,
 static void
 combine_xor_u (pixman_implementation_t *imp,
                pixman_op_t              op,
-               uint32_t *               dest,
-               const uint32_t *         src,
-               const uint32_t *         mask,
+               xuint32_t *               dest,
+               const xuint32_t *         src,
+               const xuint32_t *         mask,
                int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
-	uint32_t src_ia = ALPHA_8 (~s);
-	uint32_t dest_ia = ALPHA_8 (~d);
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
+	xuint32_t src_ia = ALPHA_8 (~s);
+	xuint32_t dest_ia = ALPHA_8 (~d);
 
 	UN8x4_MUL_UN8_ADD_UN8x4_MUL_UN8 (s, dest_ia, d, src_ia);
 	*(dest + i) = s;
@@ -418,17 +418,17 @@ combine_xor_u (pixman_implementation_t *imp,
 static void
 combine_add_u (pixman_implementation_t *imp,
                pixman_op_t              op,
-               uint32_t *               dest,
-               const uint32_t *         src,
-               const uint32_t *         mask,
+               xuint32_t *               dest,
+               const xuint32_t *         src,
+               const xuint32_t *         mask,
                int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
 	UN8x4_ADD_UN8x4 (d, s);
 	*(dest + i) = d;
     }
@@ -437,18 +437,18 @@ combine_add_u (pixman_implementation_t *imp,
 static void
 combine_saturate_u (pixman_implementation_t *imp,
                     pixman_op_t              op,
-                    uint32_t *               dest,
-                    const uint32_t *         src,
-                    const uint32_t *         mask,
+                    xuint32_t *               dest,
+                    const xuint32_t *         src,
+                    const xuint32_t *         mask,
                     int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
-	uint16_t sa, da;
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
+	xuint16_t sa, da;
 
 	sa = s >> A_SHIFT;
 	da = ~d >> A_SHIFT;
@@ -520,20 +520,20 @@ combine_saturate_u (pixman_implementation_t *imp,
 static void
 combine_multiply_u (pixman_implementation_t *imp,
                     pixman_op_t              op,
-                    uint32_t *               dest,
-                    const uint32_t *         src,
-                    const uint32_t *         mask,
+                    xuint32_t *               dest,
+                    const xuint32_t *         src,
+                    const xuint32_t *         mask,
                     int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
-	uint32_t ss = s;
-	uint32_t src_ia = ALPHA_8 (~s);
-	uint32_t dest_ia = ALPHA_8 (~d);
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
+	xuint32_t ss = s;
+	xuint32_t src_ia = ALPHA_8 (~s);
+	xuint32_t dest_ia = ALPHA_8 (~d);
 
 	UN8x4_MUL_UN8_ADD_UN8x4_MUL_UN8 (ss, dest_ia, d, src_ia);
 	UN8x4_MUL_UN8x4 (d, s);
@@ -546,20 +546,20 @@ combine_multiply_u (pixman_implementation_t *imp,
 static void
 combine_multiply_ca (pixman_implementation_t *imp,
                      pixman_op_t              op,
-                     uint32_t *               dest,
-                     const uint32_t *         src,
-                     const uint32_t *         mask,
+                     xuint32_t *               dest,
+                     const xuint32_t *         src,
+                     const xuint32_t *         mask,
                      int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t m = *(mask + i);
-	uint32_t s = *(src + i);
-	uint32_t d = *(dest + i);
-	uint32_t r = d;
-	uint32_t dest_ia = ALPHA_8 (~d);
+	xuint32_t m = *(mask + i);
+	xuint32_t s = *(src + i);
+	xuint32_t d = *(dest + i);
+	xuint32_t r = d;
+	xuint32_t dest_ia = ALPHA_8 (~d);
 
 	combine_mask_ca (&s, &m);
 
@@ -575,27 +575,27 @@ combine_multiply_ca (pixman_implementation_t *imp,
     static void								\
     combine_ ## name ## _u (pixman_implementation_t *imp,		\
 			    pixman_op_t              op,		\
-                            uint32_t *               dest,		\
-			    const uint32_t *         src,		\
-			    const uint32_t *         mask,		\
+                            xuint32_t *               dest,		\
+			    const xuint32_t *         src,		\
+			    const xuint32_t *         mask,		\
 			    int                      width)		\
     {									\
 	int i;								\
 	for (i = 0; i < width; ++i)					\
 	{								\
-	    uint32_t s = combine_mask (src, mask, i);			\
-	    uint32_t d = *(dest + i);					\
-	    uint8_t sa = ALPHA_8 (s);					\
-	    uint8_t isa = ~sa;						\
-	    uint8_t da = ALPHA_8 (d);					\
-	    uint8_t ida = ~da;						\
-	    uint32_t result;						\
+	    xuint32_t s = combine_mask (src, mask, i);			\
+	    xuint32_t d = *(dest + i);					\
+	    xuint8_t sa = ALPHA_8 (s);					\
+	    xuint8_t isa = ~sa;						\
+	    xuint8_t da = ALPHA_8 (d);					\
+	    xuint8_t ida = ~da;						\
+	    xuint32_t result;						\
 									\
 	    result = d;							\
 	    UN8x4_MUL_UN8_ADD_UN8x4_MUL_UN8 (result, isa, s, ida);	\
 	    								\
 	    *(dest + i) = result +					\
-		(DIV_ONE_UN8 (sa * (uint32_t)da) << A_SHIFT) +		\
+		(DIV_ONE_UN8 (sa * (xuint32_t)da) << A_SHIFT) +		\
 		(blend_ ## name (RED_8 (d), da, RED_8 (s), sa) << R_SHIFT) + \
 		(blend_ ## name (GREEN_8 (d), da, GREEN_8 (s), sa) << G_SHIFT) + \
 		(blend_ ## name (BLUE_8 (d), da, BLUE_8 (s), sa));	\
@@ -605,20 +605,20 @@ combine_multiply_ca (pixman_implementation_t *imp,
     static void								\
     combine_ ## name ## _ca (pixman_implementation_t *imp,		\
 			     pixman_op_t              op,		\
-                             uint32_t *               dest,		\
-			     const uint32_t *         src,		\
-			     const uint32_t *         mask,		\
+                             xuint32_t *               dest,		\
+			     const xuint32_t *         src,		\
+			     const xuint32_t *         mask,		\
 			     int                      width)		\
     {									\
 	int i;								\
 	for (i = 0; i < width; ++i)					\
 	{								\
-	    uint32_t m = *(mask + i);					\
-	    uint32_t s = *(src + i);					\
-	    uint32_t d = *(dest + i);					\
-	    uint8_t da = ALPHA_8 (d);					\
-	    uint8_t ida = ~da;						\
-	    uint32_t result;						\
+	    xuint32_t m = *(mask + i);					\
+	    xuint32_t s = *(src + i);					\
+	    xuint32_t d = *(dest + i);					\
+	    xuint8_t da = ALPHA_8 (d);					\
+	    xuint8_t ida = ~da;						\
+	    xuint32_t result;						\
             								\
 	    combine_mask_ca (&s, &m);					\
             								\
@@ -626,7 +626,7 @@ combine_multiply_ca (pixman_implementation_t *imp,
 	    UN8x4_MUL_UN8x4_ADD_UN8x4_MUL_UN8 (result, ~m, s, ida);     \
             								\
 	    result +=							\
-	        (DIV_ONE_UN8 (ALPHA_8 (m) * (uint32_t)da) << A_SHIFT) +	\
+	        (DIV_ONE_UN8 (ALPHA_8 (m) * (xuint32_t)da) << A_SHIFT) +	\
 	        (blend_ ## name (RED_8 (d), da, RED_8 (s), RED_8 (m)) << R_SHIFT) + \
 	        (blend_ ## name (GREEN_8 (d), da, GREEN_8 (s), GREEN_8 (m)) << G_SHIFT) + \
 	        (blend_ ## name (BLUE_8 (d), da, BLUE_8 (s), BLUE_8 (m))); \
@@ -642,8 +642,8 @@ combine_multiply_ca (pixman_implementation_t *imp,
  *    = ad * as * (d/ad + s/as - s/as * d/ad)
  *    = ad * s + as * d - s * d
  */
-static inline uint32_t
-blend_screen (uint32_t d, uint32_t ad, uint32_t s, uint32_t as)
+static inline xuint32_t
+blend_screen (xuint32_t d, xuint32_t ad, xuint32_t s, xuint32_t as)
 {
     return DIV_ONE_UN8 (s * ad + d * as - s * d);
 }
@@ -672,10 +672,10 @@ PDF_SEPARABLE_BLEND_MODE (screen)
  *     else
  *         as * ad - 2 * (ad - d) * (as - s)
  */
-static inline uint32_t
-blend_overlay (uint32_t d, uint32_t ad, uint32_t s, uint32_t as)
+static inline xuint32_t
+blend_overlay (xuint32_t d, xuint32_t ad, xuint32_t s, xuint32_t as)
 {
-    uint32_t r;
+    xuint32_t r;
 
     if (2 * d < ad)
 	r = 2 * s * d;
@@ -694,8 +694,8 @@ PDF_SEPARABLE_BLEND_MODE (overlay)
  *   = ad * as * MIN(d/ad, s/as)
  *   = MIN (as * d, ad * s)
  */
-static inline uint32_t
-blend_darken (uint32_t d, uint32_t ad, uint32_t s, uint32_t as)
+static inline xuint32_t
+blend_darken (xuint32_t d, xuint32_t ad, xuint32_t s, xuint32_t as)
 {
     s = ad * s;
     d = as * d;
@@ -712,8 +712,8 @@ PDF_SEPARABLE_BLEND_MODE (darken)
  *   = ad * as * MAX(d/ad, s/as)
  *   = MAX (as * d, ad * s)
  */
-static inline uint32_t
-blend_lighten (uint32_t d, uint32_t ad, uint32_t s, uint32_t as)
+static inline xuint32_t
+blend_lighten (xuint32_t d, xuint32_t ad, xuint32_t s, xuint32_t as)
 {
     s = ad * s;
     d = as * d;
@@ -741,8 +741,8 @@ PDF_SEPARABLE_BLEND_MODE (lighten)
  *         as * (as * d / (as - s))
  *
  */
-static inline uint32_t
-blend_color_dodge (uint32_t d, uint32_t ad, uint32_t s, uint32_t as)
+static inline xuint32_t
+blend_color_dodge (xuint32_t d, xuint32_t ad, xuint32_t s, xuint32_t as)
 {
     if (d == 0)
         return 0;
@@ -776,8 +776,8 @@ PDF_SEPARABLE_BLEND_MODE (color_dodge)
  *     else
  *         ad * as  - as * as * (ad - d) / s
  */
-static inline uint32_t
-blend_color_burn (uint32_t d, uint32_t ad, uint32_t s, uint32_t as)
+static inline xuint32_t
+blend_color_burn (xuint32_t d, xuint32_t ad, xuint32_t s, xuint32_t as)
 {
     if (d >= ad)
 	return DIV_ONE_UN8 (ad * as);
@@ -808,8 +808,8 @@ PDF_SEPARABLE_BLEND_MODE (color_burn)
  *     else
  *         as * ad - 2 * (ad - d) * (as - s)
  */
-static inline uint32_t
-blend_hard_light (uint32_t d, uint32_t ad, uint32_t s, uint32_t as)
+static inline xuint32_t
+blend_hard_light (xuint32_t d, xuint32_t ad, xuint32_t s, xuint32_t as)
 {
     if (2 * s < as)
 	return DIV_ONE_UN8 (2 * s * d);
@@ -836,11 +836,11 @@ PDF_SEPARABLE_BLEND_MODE (hard_light)
  *     else
  *         d * as + (sqrt (d * ad) - d) * (2 * s - as);
  */
-static inline uint32_t
-blend_soft_light (uint32_t d_org,
-		  uint32_t ad_org,
-		  uint32_t s_org,
-		  uint32_t as_org)
+static inline xuint32_t
+blend_soft_light (xuint32_t d_org,
+		  xuint32_t ad_org,
+		  xuint32_t s_org,
+		  xuint32_t as_org)
 {
     double d = d_org * (1.0 / MASK);
     double ad = ad_org * (1.0 / MASK);
@@ -887,11 +887,11 @@ PDF_SEPARABLE_BLEND_MODE (soft_light)
  *     else
  *        ad * s - as * d
  */
-static inline uint32_t
-blend_difference (uint32_t d, uint32_t ad, uint32_t s, uint32_t as)
+static inline xuint32_t
+blend_difference (xuint32_t d, xuint32_t ad, xuint32_t s, xuint32_t as)
 {
-    uint32_t das = d * as;
-    uint32_t sad = s * ad;
+    xuint32_t das = d * as;
+    xuint32_t sad = s * ad;
 
     if (sad < das)
 	return DIV_ONE_UN8 (das - sad);
@@ -912,8 +912,8 @@ PDF_SEPARABLE_BLEND_MODE (difference)
 /* This can be made faster by writing it directly and not using
  * PDF_SEPARABLE_BLEND_MODE, but that's a performance optimization */
 
-static inline uint32_t
-blend_exclusion (uint32_t d, uint32_t ad, uint32_t s, uint32_t as)
+static inline xuint32_t
+blend_exclusion (xuint32_t d, xuint32_t ad, xuint32_t s, xuint32_t as)
 {
     return DIV_ONE_UN8 (s * ad + d * as - 2 * d * s);
 }
@@ -1006,22 +1006,22 @@ PDF_SEPARABLE_BLEND_MODE (exclusion)
     static void								\
     combine_ ## name ## _u (pixman_implementation_t *imp,		\
 			    pixman_op_t		     op,		\
-                            uint32_t *               dest,		\
-			    const uint32_t *         src,		\
-			    const uint32_t *         mask,		\
+                            xuint32_t *               dest,		\
+			    const xuint32_t *         src,		\
+			    const xuint32_t *         mask,		\
 			    int                      width)		\
     {									\
 	int i;								\
 	for (i = 0; i < width; ++i)					\
 	{								\
-	    uint32_t s = combine_mask (src, mask, i);			\
-	    uint32_t d = *(dest + i);					\
-	    uint8_t sa = ALPHA_8 (s);					\
-	    uint8_t isa = ~sa;						\
-	    uint8_t da = ALPHA_8 (d);					\
-	    uint8_t ida = ~da;						\
-	    uint32_t result;						\
-	    uint32_t sc[3], dc[3], c[3];				\
+	    xuint32_t s = combine_mask (src, mask, i);			\
+	    xuint32_t d = *(dest + i);					\
+	    xuint8_t sa = ALPHA_8 (s);					\
+	    xuint8_t isa = ~sa;						\
+	    xuint8_t da = ALPHA_8 (d);					\
+	    xuint8_t ida = ~da;						\
+	    xuint32_t result;						\
+	    xuint32_t sc[3], dc[3], c[3];				\
             								\
 	    result = d;							\
 	    UN8x4_MUL_UN8_ADD_UN8x4_MUL_UN8 (result, isa, s, ida);	\
@@ -1034,7 +1034,7 @@ PDF_SEPARABLE_BLEND_MODE (exclusion)
 	    blend_ ## name (c, dc, da, sc, sa);				\
             								\
 	    *(dest + i) = result +					\
-		(DIV_ONE_UN8 (sa * (uint32_t)da) << A_SHIFT) +		\
+		(DIV_ONE_UN8 (sa * (xuint32_t)da) << A_SHIFT) +		\
 		(DIV_ONE_UN8 (c[0]) << R_SHIFT) +			\
 		(DIV_ONE_UN8 (c[1]) << G_SHIFT) +			\
 		(DIV_ONE_UN8 (c[2]));					\
@@ -1042,7 +1042,7 @@ PDF_SEPARABLE_BLEND_MODE (exclusion)
     }
 
 static void
-set_lum (uint32_t dest[3], uint32_t src[3], uint32_t sa, uint32_t lum)
+set_lum (xuint32_t dest[3], xuint32_t src[3], xuint32_t sa, xuint32_t lum)
 {
     double a, l, min, max;
     double tmp[3];
@@ -1101,10 +1101,10 @@ set_lum (uint32_t dest[3], uint32_t src[3], uint32_t sa, uint32_t lum)
 }
 
 static void
-set_sat (uint32_t dest[3], uint32_t src[3], uint32_t sat)
+set_sat (xuint32_t dest[3], xuint32_t src[3], xuint32_t sat)
 {
     int id[3];
-    uint32_t min, max;
+    xuint32_t min, max;
 
     if (src[0] > src[1])
     {
@@ -1175,11 +1175,11 @@ set_sat (uint32_t dest[3], uint32_t src[3], uint32_t sat)
  *
  */
 static inline void
-blend_hsl_hue (uint32_t r[3],
-               uint32_t d[3],
-               uint32_t ad,
-               uint32_t s[3],
-               uint32_t as)
+blend_hsl_hue (xuint32_t r[3],
+               xuint32_t d[3],
+               xuint32_t ad,
+               xuint32_t s[3],
+               xuint32_t as)
 {
     r[0] = s[0] * ad;
     r[1] = s[1] * ad;
@@ -1200,11 +1200,11 @@ PDF_NON_SEPARABLE_BLEND_MODE (hsl_hue)
  *   = set_lum (set_sat (as * d, ad * SAT (s), as * LUM (d), as * ad))
  */
 static inline void
-blend_hsl_saturation (uint32_t r[3],
-                      uint32_t d[3],
-                      uint32_t ad,
-                      uint32_t s[3],
-                      uint32_t as)
+blend_hsl_saturation (xuint32_t r[3],
+                      xuint32_t d[3],
+                      xuint32_t ad,
+                      xuint32_t s[3],
+                      xuint32_t as)
 {
     r[0] = d[0] * as;
     r[1] = d[1] * as;
@@ -1223,11 +1223,11 @@ PDF_NON_SEPARABLE_BLEND_MODE (hsl_saturation)
  *   = set_lum (s * ad, as * LUM (d), as * ad)
  */
 static inline void
-blend_hsl_color (uint32_t r[3],
-                 uint32_t d[3],
-                 uint32_t ad,
-                 uint32_t s[3],
-                 uint32_t as)
+blend_hsl_color (xuint32_t r[3],
+                 xuint32_t d[3],
+                 xuint32_t ad,
+                 xuint32_t s[3],
+                 xuint32_t as)
 {
     r[0] = s[0] * ad;
     r[1] = s[1] * ad;
@@ -1245,11 +1245,11 @@ PDF_NON_SEPARABLE_BLEND_MODE (hsl_color)
  *   = set_lum (as * d, ad * LUM (s), as * ad)
  */
 static inline void
-blend_hsl_luminosity (uint32_t r[3],
-                      uint32_t d[3],
-                      uint32_t ad,
-                      uint32_t s[3],
-                      uint32_t as)
+blend_hsl_luminosity (xuint32_t r[3],
+                      xuint32_t d[3],
+                      xuint32_t ad,
+                      xuint32_t s[3],
+                      xuint32_t as)
 {
     r[0] = d[0] * as;
     r[1] = d[1] * as;
@@ -1306,8 +1306,8 @@ PDF_NON_SEPARABLE_BLEND_MODE (hsl_luminosity)
 #define COMBINE_XOR     (COMBINE_A_OUT | COMBINE_B_OUT)
 
 /* portion covered by a but not b */
-static uint8_t
-combine_disjoint_out_part (uint8_t a, uint8_t b)
+static xuint8_t
+combine_disjoint_out_part (xuint8_t a, xuint8_t b)
 {
     /* min (1, (1-b) / a) */
 
@@ -1318,8 +1318,8 @@ combine_disjoint_out_part (uint8_t a, uint8_t b)
 }
 
 /* portion covered by both a and b */
-static uint8_t
-combine_disjoint_in_part (uint8_t a, uint8_t b)
+static xuint8_t
+combine_disjoint_in_part (xuint8_t a, xuint8_t b)
 {
     /* max (1-(1-b)/a,0) */
     /*  = - min ((1-b)/a - 1, 0) */
@@ -1332,8 +1332,8 @@ combine_disjoint_in_part (uint8_t a, uint8_t b)
 }
 
 /* portion covered by a but not b */
-static uint8_t
-combine_conjoint_out_part (uint8_t a, uint8_t b)
+static xuint8_t
+combine_conjoint_out_part (xuint8_t a, xuint8_t b)
 {
     /* max (1-b/a,0) */
     /* = 1-min(b/a,1) */
@@ -1346,8 +1346,8 @@ combine_conjoint_out_part (uint8_t a, uint8_t b)
 }
 
 /* portion covered by both a and b */
-static uint8_t
-combine_conjoint_in_part (uint8_t a, uint8_t b)
+static xuint8_t
+combine_conjoint_in_part (xuint8_t a, xuint8_t b)
 {
     /* min (1,b/a) */
 
@@ -1356,35 +1356,35 @@ combine_conjoint_in_part (uint8_t a, uint8_t b)
     return DIV_UN8 (b, a);     /* b/a */
 }
 
-#define GET_COMP(v, i)   ((uint16_t) (uint8_t) ((v) >> i))
+#define GET_COMP(v, i)   ((xuint16_t) (xuint8_t) ((v) >> i))
 
 #define ADD(x, y, i, t)							\
     ((t) = GET_COMP (x, i) + GET_COMP (y, i),				\
-     (uint32_t) ((uint8_t) ((t) | (0 - ((t) >> G_SHIFT)))) << (i))
+     (xuint32_t) ((xuint8_t) ((t) | (0 - ((t) >> G_SHIFT)))) << (i))
 
 #define GENERIC(x, y, i, ax, ay, t, u, v)				\
     ((t) = (MUL_UN8 (GET_COMP (y, i), ay, (u)) +			\
             MUL_UN8 (GET_COMP (x, i), ax, (v))),			\
-     (uint32_t) ((uint8_t) ((t) |					\
+     (xuint32_t) ((xuint8_t) ((t) |					\
                            (0 - ((t) >> G_SHIFT)))) << (i))
 
 static void
-combine_disjoint_general_u (uint32_t *      dest,
-                            const uint32_t *src,
-                            const uint32_t *mask,
+combine_disjoint_general_u (xuint32_t *      dest,
+                            const xuint32_t *src,
+                            const xuint32_t *mask,
                             int            width,
-                            uint8_t        combine)
+                            xuint8_t        combine)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
-	uint32_t m, n, o, p;
-	uint16_t Fa, Fb, t, u, v;
-	uint8_t sa = s >> A_SHIFT;
-	uint8_t da = d >> A_SHIFT;
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
+	xuint32_t m, n, o, p;
+	xuint16_t Fa, Fb, t, u, v;
+	xuint8_t sa = s >> A_SHIFT;
+	xuint8_t da = d >> A_SHIFT;
 
 	switch (combine & COMBINE_A)
 	{
@@ -1435,21 +1435,21 @@ combine_disjoint_general_u (uint32_t *      dest,
 static void
 combine_disjoint_over_u (pixman_implementation_t *imp,
                          pixman_op_t              op,
-                         uint32_t *                dest,
-                         const uint32_t *          src,
-                         const uint32_t *          mask,
+                         xuint32_t *                dest,
+                         const xuint32_t *          src,
+                         const xuint32_t *          mask,
                          int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint16_t a = s >> A_SHIFT;
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint16_t a = s >> A_SHIFT;
 
 	if (s != 0x00)
 	{
-	    uint32_t d = *(dest + i);
+	    xuint32_t d = *(dest + i);
 	    a = combine_disjoint_out_part (d >> A_SHIFT, a);
 	    UN8x4_MUL_UN8_ADD_UN8x4 (d, a, s);
 
@@ -1461,9 +1461,9 @@ combine_disjoint_over_u (pixman_implementation_t *imp,
 static void
 combine_disjoint_in_u (pixman_implementation_t *imp,
                        pixman_op_t              op,
-                       uint32_t *                dest,
-                       const uint32_t *          src,
-                       const uint32_t *          mask,
+                       xuint32_t *                dest,
+                       const xuint32_t *          src,
+                       const xuint32_t *          mask,
                        int                      width)
 {
     combine_disjoint_general_u (dest, src, mask, width, COMBINE_A_IN);
@@ -1472,9 +1472,9 @@ combine_disjoint_in_u (pixman_implementation_t *imp,
 static void
 combine_disjoint_in_reverse_u (pixman_implementation_t *imp,
                                pixman_op_t              op,
-                               uint32_t *                dest,
-                               const uint32_t *          src,
-                               const uint32_t *          mask,
+                               xuint32_t *                dest,
+                               const xuint32_t *          src,
+                               const xuint32_t *          mask,
                                int                      width)
 {
     combine_disjoint_general_u (dest, src, mask, width, COMBINE_B_IN);
@@ -1483,9 +1483,9 @@ combine_disjoint_in_reverse_u (pixman_implementation_t *imp,
 static void
 combine_disjoint_out_u (pixman_implementation_t *imp,
                         pixman_op_t              op,
-                        uint32_t *                dest,
-                        const uint32_t *          src,
-                        const uint32_t *          mask,
+                        xuint32_t *                dest,
+                        const xuint32_t *          src,
+                        const xuint32_t *          mask,
                         int                      width)
 {
     combine_disjoint_general_u (dest, src, mask, width, COMBINE_A_OUT);
@@ -1494,9 +1494,9 @@ combine_disjoint_out_u (pixman_implementation_t *imp,
 static void
 combine_disjoint_out_reverse_u (pixman_implementation_t *imp,
                                 pixman_op_t              op,
-                                uint32_t *                dest,
-                                const uint32_t *          src,
-                                const uint32_t *          mask,
+                                xuint32_t *                dest,
+                                const xuint32_t *          src,
+                                const xuint32_t *          mask,
                                 int                      width)
 {
     combine_disjoint_general_u (dest, src, mask, width, COMBINE_B_OUT);
@@ -1505,9 +1505,9 @@ combine_disjoint_out_reverse_u (pixman_implementation_t *imp,
 static void
 combine_disjoint_atop_u (pixman_implementation_t *imp,
                          pixman_op_t              op,
-                         uint32_t *                dest,
-                         const uint32_t *          src,
-                         const uint32_t *          mask,
+                         xuint32_t *                dest,
+                         const xuint32_t *          src,
+                         const xuint32_t *          mask,
                          int                      width)
 {
     combine_disjoint_general_u (dest, src, mask, width, COMBINE_A_ATOP);
@@ -1516,9 +1516,9 @@ combine_disjoint_atop_u (pixman_implementation_t *imp,
 static void
 combine_disjoint_atop_reverse_u (pixman_implementation_t *imp,
                                  pixman_op_t              op,
-                                 uint32_t *                dest,
-                                 const uint32_t *          src,
-                                 const uint32_t *          mask,
+                                 xuint32_t *                dest,
+                                 const xuint32_t *          src,
+                                 const xuint32_t *          mask,
                                  int                      width)
 {
     combine_disjoint_general_u (dest, src, mask, width, COMBINE_B_ATOP);
@@ -1527,31 +1527,31 @@ combine_disjoint_atop_reverse_u (pixman_implementation_t *imp,
 static void
 combine_disjoint_xor_u (pixman_implementation_t *imp,
                         pixman_op_t              op,
-                        uint32_t *                dest,
-                        const uint32_t *          src,
-                        const uint32_t *          mask,
+                        xuint32_t *                dest,
+                        const xuint32_t *          src,
+                        const xuint32_t *          mask,
                         int                      width)
 {
     combine_disjoint_general_u (dest, src, mask, width, COMBINE_XOR);
 }
 
 static void
-combine_conjoint_general_u (uint32_t *      dest,
-                            const uint32_t *src,
-                            const uint32_t *mask,
+combine_conjoint_general_u (xuint32_t *      dest,
+                            const xuint32_t *src,
+                            const xuint32_t *mask,
                             int            width,
-                            uint8_t        combine)
+                            xuint8_t        combine)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = combine_mask (src, mask, i);
-	uint32_t d = *(dest + i);
-	uint32_t m, n, o, p;
-	uint16_t Fa, Fb, t, u, v;
-	uint8_t sa = s >> A_SHIFT;
-	uint8_t da = d >> A_SHIFT;
+	xuint32_t s = combine_mask (src, mask, i);
+	xuint32_t d = *(dest + i);
+	xuint32_t m, n, o, p;
+	xuint16_t Fa, Fb, t, u, v;
+	xuint8_t sa = s >> A_SHIFT;
+	xuint8_t da = d >> A_SHIFT;
 
 	switch (combine & COMBINE_A)
 	{
@@ -1605,9 +1605,9 @@ combine_conjoint_general_u (uint32_t *      dest,
 static void
 combine_conjoint_over_u (pixman_implementation_t *imp,
                          pixman_op_t              op,
-                         uint32_t *                dest,
-                         const uint32_t *          src,
-                         const uint32_t *          mask,
+                         xuint32_t *                dest,
+                         const xuint32_t *          src,
+                         const xuint32_t *          mask,
                          int                      width)
 {
     combine_conjoint_general_u (dest, src, mask, width, COMBINE_A_OVER);
@@ -1616,9 +1616,9 @@ combine_conjoint_over_u (pixman_implementation_t *imp,
 static void
 combine_conjoint_over_reverse_u (pixman_implementation_t *imp,
                                  pixman_op_t              op,
-                                 uint32_t *                dest,
-                                 const uint32_t *          src,
-                                 const uint32_t *          mask,
+                                 xuint32_t *                dest,
+                                 const xuint32_t *          src,
+                                 const xuint32_t *          mask,
                                  int                      width)
 {
     combine_conjoint_general_u (dest, src, mask, width, COMBINE_B_OVER);
@@ -1627,9 +1627,9 @@ combine_conjoint_over_reverse_u (pixman_implementation_t *imp,
 static void
 combine_conjoint_in_u (pixman_implementation_t *imp,
                        pixman_op_t              op,
-                       uint32_t *                dest,
-                       const uint32_t *          src,
-                       const uint32_t *          mask,
+                       xuint32_t *                dest,
+                       const xuint32_t *          src,
+                       const xuint32_t *          mask,
                        int                      width)
 {
     combine_conjoint_general_u (dest, src, mask, width, COMBINE_A_IN);
@@ -1638,9 +1638,9 @@ combine_conjoint_in_u (pixman_implementation_t *imp,
 static void
 combine_conjoint_in_reverse_u (pixman_implementation_t *imp,
                                pixman_op_t              op,
-                               uint32_t *                dest,
-                               const uint32_t *          src,
-                               const uint32_t *          mask,
+                               xuint32_t *                dest,
+                               const xuint32_t *          src,
+                               const xuint32_t *          mask,
                                int                      width)
 {
     combine_conjoint_general_u (dest, src, mask, width, COMBINE_B_IN);
@@ -1649,9 +1649,9 @@ combine_conjoint_in_reverse_u (pixman_implementation_t *imp,
 static void
 combine_conjoint_out_u (pixman_implementation_t *imp,
                         pixman_op_t              op,
-                        uint32_t *                dest,
-                        const uint32_t *          src,
-                        const uint32_t *          mask,
+                        xuint32_t *                dest,
+                        const xuint32_t *          src,
+                        const xuint32_t *          mask,
                         int                      width)
 {
     combine_conjoint_general_u (dest, src, mask, width, COMBINE_A_OUT);
@@ -1660,9 +1660,9 @@ combine_conjoint_out_u (pixman_implementation_t *imp,
 static void
 combine_conjoint_out_reverse_u (pixman_implementation_t *imp,
                                 pixman_op_t              op,
-                                uint32_t *                dest,
-                                const uint32_t *          src,
-                                const uint32_t *          mask,
+                                xuint32_t *                dest,
+                                const xuint32_t *          src,
+                                const xuint32_t *          mask,
                                 int                      width)
 {
     combine_conjoint_general_u (dest, src, mask, width, COMBINE_B_OUT);
@@ -1671,9 +1671,9 @@ combine_conjoint_out_reverse_u (pixman_implementation_t *imp,
 static void
 combine_conjoint_atop_u (pixman_implementation_t *imp,
                          pixman_op_t              op,
-                         uint32_t *                dest,
-                         const uint32_t *          src,
-                         const uint32_t *          mask,
+                         xuint32_t *                dest,
+                         const xuint32_t *          src,
+                         const xuint32_t *          mask,
                          int                      width)
 {
     combine_conjoint_general_u (dest, src, mask, width, COMBINE_A_ATOP);
@@ -1682,9 +1682,9 @@ combine_conjoint_atop_u (pixman_implementation_t *imp,
 static void
 combine_conjoint_atop_reverse_u (pixman_implementation_t *imp,
                                  pixman_op_t              op,
-                                 uint32_t *                dest,
-                                 const uint32_t *          src,
-                                 const uint32_t *          mask,
+                                 xuint32_t *                dest,
+                                 const xuint32_t *          src,
+                                 const xuint32_t *          mask,
                                  int                      width)
 {
     combine_conjoint_general_u (dest, src, mask, width, COMBINE_B_ATOP);
@@ -1693,9 +1693,9 @@ combine_conjoint_atop_reverse_u (pixman_implementation_t *imp,
 static void
 combine_conjoint_xor_u (pixman_implementation_t *imp,
                         pixman_op_t              op,
-                        uint32_t *                dest,
-                        const uint32_t *          src,
-                        const uint32_t *          mask,
+                        xuint32_t *                dest,
+                        const xuint32_t *          src,
+                        const xuint32_t *          mask,
                         int                      width)
 {
     combine_conjoint_general_u (dest, src, mask, width, COMBINE_XOR);
@@ -1707,28 +1707,28 @@ combine_conjoint_xor_u (pixman_implementation_t *imp,
 static void
 combine_clear_ca (pixman_implementation_t *imp,
                   pixman_op_t              op,
-                  uint32_t *                dest,
-                  const uint32_t *          src,
-                  const uint32_t *          mask,
+                  xuint32_t *                dest,
+                  const xuint32_t *          src,
+                  const xuint32_t *          mask,
                   int                      width)
 {
-    memset (dest, 0, width * sizeof(uint32_t));
+    xmemory_set (dest, 0, width * sizeof(xuint32_t));
 }
 
 static void
 combine_src_ca (pixman_implementation_t *imp,
                 pixman_op_t              op,
-                uint32_t *                dest,
-                const uint32_t *          src,
-                const uint32_t *          mask,
+                xuint32_t *                dest,
+                const xuint32_t *          src,
+                const xuint32_t *          mask,
                 int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = *(src + i);
-	uint32_t m = *(mask + i);
+	xuint32_t s = *(src + i);
+	xuint32_t m = *(mask + i);
 
 	combine_mask_value_ca (&s, &m);
 
@@ -1739,25 +1739,25 @@ combine_src_ca (pixman_implementation_t *imp,
 static void
 combine_over_ca (pixman_implementation_t *imp,
                  pixman_op_t              op,
-                 uint32_t *                dest,
-                 const uint32_t *          src,
-                 const uint32_t *          mask,
+                 xuint32_t *                dest,
+                 const xuint32_t *          src,
+                 const xuint32_t *          mask,
                  int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = *(src + i);
-	uint32_t m = *(mask + i);
-	uint32_t a;
+	xuint32_t s = *(src + i);
+	xuint32_t m = *(mask + i);
+	xuint32_t a;
 
 	combine_mask_ca (&s, &m);
 
 	a = ~m;
 	if (a)
 	{
-	    uint32_t d = *(dest + i);
+	    xuint32_t d = *(dest + i);
 	    UN8x4_MUL_UN8x4_ADD_UN8x4 (d, a, s);
 	    s = d;
 	}
@@ -1769,22 +1769,22 @@ combine_over_ca (pixman_implementation_t *imp,
 static void
 combine_over_reverse_ca (pixman_implementation_t *imp,
                          pixman_op_t              op,
-                         uint32_t *                dest,
-                         const uint32_t *          src,
-                         const uint32_t *          mask,
+                         xuint32_t *                dest,
+                         const xuint32_t *          src,
+                         const xuint32_t *          mask,
                          int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t d = *(dest + i);
-	uint32_t a = ~d >> A_SHIFT;
+	xuint32_t d = *(dest + i);
+	xuint32_t a = ~d >> A_SHIFT;
 
 	if (a)
 	{
-	    uint32_t s = *(src + i);
-	    uint32_t m = *(mask + i);
+	    xuint32_t s = *(src + i);
+	    xuint32_t m = *(mask + i);
 
 	    UN8x4_MUL_UN8x4 (s, m);
 	    UN8x4_MUL_UN8_ADD_UN8x4 (s, a, d);
@@ -1797,22 +1797,22 @@ combine_over_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_in_ca (pixman_implementation_t *imp,
                pixman_op_t              op,
-               uint32_t *                dest,
-               const uint32_t *          src,
-               const uint32_t *          mask,
+               xuint32_t *                dest,
+               const xuint32_t *          src,
+               const xuint32_t *          mask,
                int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t d = *(dest + i);
-	uint16_t a = d >> A_SHIFT;
-	uint32_t s = 0;
+	xuint32_t d = *(dest + i);
+	xuint16_t a = d >> A_SHIFT;
+	xuint32_t s = 0;
 
 	if (a)
 	{
-	    uint32_t m = *(mask + i);
+	    xuint32_t m = *(mask + i);
 
 	    s = *(src + i);
 	    combine_mask_value_ca (&s, &m);
@@ -1828,25 +1828,25 @@ combine_in_ca (pixman_implementation_t *imp,
 static void
 combine_in_reverse_ca (pixman_implementation_t *imp,
                        pixman_op_t              op,
-                       uint32_t *                dest,
-                       const uint32_t *          src,
-                       const uint32_t *          mask,
+                       xuint32_t *                dest,
+                       const xuint32_t *          src,
+                       const xuint32_t *          mask,
                        int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = *(src + i);
-	uint32_t m = *(mask + i);
-	uint32_t a;
+	xuint32_t s = *(src + i);
+	xuint32_t m = *(mask + i);
+	xuint32_t a;
 
 	combine_mask_alpha_ca (&s, &m);
 
 	a = m;
 	if (a != ~0)
 	{
-	    uint32_t d = 0;
+	    xuint32_t d = 0;
 
 	    if (a)
 	    {
@@ -1862,22 +1862,22 @@ combine_in_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_out_ca (pixman_implementation_t *imp,
                 pixman_op_t              op,
-                uint32_t *                dest,
-                const uint32_t *          src,
-                const uint32_t *          mask,
+                xuint32_t *                dest,
+                const xuint32_t *          src,
+                const xuint32_t *          mask,
                 int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t d = *(dest + i);
-	uint16_t a = ~d >> A_SHIFT;
-	uint32_t s = 0;
+	xuint32_t d = *(dest + i);
+	xuint16_t a = ~d >> A_SHIFT;
+	xuint32_t s = 0;
 
 	if (a)
 	{
-	    uint32_t m = *(mask + i);
+	    xuint32_t m = *(mask + i);
 
 	    s = *(src + i);
 	    combine_mask_value_ca (&s, &m);
@@ -1893,25 +1893,25 @@ combine_out_ca (pixman_implementation_t *imp,
 static void
 combine_out_reverse_ca (pixman_implementation_t *imp,
                         pixman_op_t              op,
-                        uint32_t *                dest,
-                        const uint32_t *          src,
-                        const uint32_t *          mask,
+                        xuint32_t *                dest,
+                        const xuint32_t *          src,
+                        const xuint32_t *          mask,
                         int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = *(src + i);
-	uint32_t m = *(mask + i);
-	uint32_t a;
+	xuint32_t s = *(src + i);
+	xuint32_t m = *(mask + i);
+	xuint32_t a;
 
 	combine_mask_alpha_ca (&s, &m);
 
 	a = ~m;
 	if (a != ~0)
 	{
-	    uint32_t d = 0;
+	    xuint32_t d = 0;
 
 	    if (a)
 	    {
@@ -1927,20 +1927,20 @@ combine_out_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_atop_ca (pixman_implementation_t *imp,
                  pixman_op_t              op,
-                 uint32_t *                dest,
-                 const uint32_t *          src,
-                 const uint32_t *          mask,
+                 xuint32_t *                dest,
+                 const xuint32_t *          src,
+                 const xuint32_t *          mask,
                  int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t d = *(dest + i);
-	uint32_t s = *(src + i);
-	uint32_t m = *(mask + i);
-	uint32_t ad;
-	uint16_t as = d >> A_SHIFT;
+	xuint32_t d = *(dest + i);
+	xuint32_t s = *(src + i);
+	xuint32_t m = *(mask + i);
+	xuint32_t ad;
+	xuint16_t as = d >> A_SHIFT;
 
 	combine_mask_ca (&s, &m);
 
@@ -1955,20 +1955,20 @@ combine_atop_ca (pixman_implementation_t *imp,
 static void
 combine_atop_reverse_ca (pixman_implementation_t *imp,
                          pixman_op_t              op,
-                         uint32_t *                dest,
-                         const uint32_t *          src,
-                         const uint32_t *          mask,
+                         xuint32_t *                dest,
+                         const xuint32_t *          src,
+                         const xuint32_t *          mask,
                          int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t d = *(dest + i);
-	uint32_t s = *(src + i);
-	uint32_t m = *(mask + i);
-	uint32_t ad;
-	uint16_t as = ~d >> A_SHIFT;
+	xuint32_t d = *(dest + i);
+	xuint32_t s = *(src + i);
+	xuint32_t m = *(mask + i);
+	xuint32_t ad;
+	xuint16_t as = ~d >> A_SHIFT;
 
 	combine_mask_ca (&s, &m);
 
@@ -1983,20 +1983,20 @@ combine_atop_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_xor_ca (pixman_implementation_t *imp,
                 pixman_op_t              op,
-                uint32_t *                dest,
-                const uint32_t *          src,
-                const uint32_t *          mask,
+                xuint32_t *                dest,
+                const xuint32_t *          src,
+                const xuint32_t *          mask,
                 int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t d = *(dest + i);
-	uint32_t s = *(src + i);
-	uint32_t m = *(mask + i);
-	uint32_t ad;
-	uint16_t as = ~d >> A_SHIFT;
+	xuint32_t d = *(dest + i);
+	xuint32_t s = *(src + i);
+	xuint32_t m = *(mask + i);
+	xuint32_t ad;
+	xuint16_t as = ~d >> A_SHIFT;
 
 	combine_mask_ca (&s, &m);
 
@@ -2011,18 +2011,18 @@ combine_xor_ca (pixman_implementation_t *imp,
 static void
 combine_add_ca (pixman_implementation_t *imp,
                 pixman_op_t              op,
-                uint32_t *                dest,
-                const uint32_t *          src,
-                const uint32_t *          mask,
+                xuint32_t *                dest,
+                const xuint32_t *          src,
+                const xuint32_t *          mask,
                 int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s = *(src + i);
-	uint32_t m = *(mask + i);
-	uint32_t d = *(dest + i);
+	xuint32_t s = *(src + i);
+	xuint32_t m = *(mask + i);
+	xuint32_t d = *(dest + i);
 
 	combine_mask_value_ca (&s, &m);
 
@@ -2035,19 +2035,19 @@ combine_add_ca (pixman_implementation_t *imp,
 static void
 combine_saturate_ca (pixman_implementation_t *imp,
                      pixman_op_t              op,
-                     uint32_t *                dest,
-                     const uint32_t *          src,
-                     const uint32_t *          mask,
+                     xuint32_t *                dest,
+                     const xuint32_t *          src,
+                     const xuint32_t *          mask,
                      int                      width)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s, d;
-	uint16_t sa, sr, sg, sb, da;
-	uint16_t t, u, v;
-	uint32_t m, n, o, p;
+	xuint32_t s, d;
+	xuint16_t sa, sr, sg, sb, da;
+	xuint16_t t, u, v;
+	xuint32_t m, n, o, p;
 
 	d = *(dest + i);
 	s = *(src + i);
@@ -2086,22 +2086,22 @@ combine_saturate_ca (pixman_implementation_t *imp,
 }
 
 static void
-combine_disjoint_general_ca (uint32_t *      dest,
-                             const uint32_t *src,
-                             const uint32_t *mask,
+combine_disjoint_general_ca (xuint32_t *      dest,
+                             const xuint32_t *src,
+                             const xuint32_t *mask,
                              int            width,
-                             uint8_t        combine)
+                             xuint8_t        combine)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s, d;
-	uint32_t m, n, o, p;
-	uint32_t Fa, Fb;
-	uint16_t t, u, v;
-	uint32_t sa;
-	uint8_t da;
+	xuint32_t s, d;
+	xuint32_t m, n, o, p;
+	xuint32_t Fa, Fb;
+	xuint16_t t, u, v;
+	xuint32_t sa;
+	xuint8_t da;
 
 	s = *(src + i);
 	m = *(mask + i);
@@ -2119,18 +2119,18 @@ combine_disjoint_general_ca (uint32_t *      dest,
 	    break;
 
 	case COMBINE_A_OUT:
-	    m = (uint32_t)combine_disjoint_out_part ((uint8_t) (sa >> 0), da);
-	    n = (uint32_t)combine_disjoint_out_part ((uint8_t) (sa >> G_SHIFT), da) << G_SHIFT;
-	    o = (uint32_t)combine_disjoint_out_part ((uint8_t) (sa >> R_SHIFT), da) << R_SHIFT;
-	    p = (uint32_t)combine_disjoint_out_part ((uint8_t) (sa >> A_SHIFT), da) << A_SHIFT;
+	    m = (xuint32_t)combine_disjoint_out_part ((xuint8_t) (sa >> 0), da);
+	    n = (xuint32_t)combine_disjoint_out_part ((xuint8_t) (sa >> G_SHIFT), da) << G_SHIFT;
+	    o = (xuint32_t)combine_disjoint_out_part ((xuint8_t) (sa >> R_SHIFT), da) << R_SHIFT;
+	    p = (xuint32_t)combine_disjoint_out_part ((xuint8_t) (sa >> A_SHIFT), da) << A_SHIFT;
 	    Fa = m | n | o | p;
 	    break;
 
 	case COMBINE_A_IN:
-	    m = (uint32_t)combine_disjoint_in_part ((uint8_t) (sa >> 0), da);
-	    n = (uint32_t)combine_disjoint_in_part ((uint8_t) (sa >> G_SHIFT), da) << G_SHIFT;
-	    o = (uint32_t)combine_disjoint_in_part ((uint8_t) (sa >> R_SHIFT), da) << R_SHIFT;
-	    p = (uint32_t)combine_disjoint_in_part ((uint8_t) (sa >> A_SHIFT), da) << A_SHIFT;
+	    m = (xuint32_t)combine_disjoint_in_part ((xuint8_t) (sa >> 0), da);
+	    n = (xuint32_t)combine_disjoint_in_part ((xuint8_t) (sa >> G_SHIFT), da) << G_SHIFT;
+	    o = (xuint32_t)combine_disjoint_in_part ((xuint8_t) (sa >> R_SHIFT), da) << R_SHIFT;
+	    p = (xuint32_t)combine_disjoint_in_part ((xuint8_t) (sa >> A_SHIFT), da) << A_SHIFT;
 	    Fa = m | n | o | p;
 	    break;
 
@@ -2146,18 +2146,18 @@ combine_disjoint_general_ca (uint32_t *      dest,
 	    break;
 
 	case COMBINE_B_OUT:
-	    m = (uint32_t)combine_disjoint_out_part (da, (uint8_t) (sa >> 0));
-	    n = (uint32_t)combine_disjoint_out_part (da, (uint8_t) (sa >> G_SHIFT)) << G_SHIFT;
-	    o = (uint32_t)combine_disjoint_out_part (da, (uint8_t) (sa >> R_SHIFT)) << R_SHIFT;
-	    p = (uint32_t)combine_disjoint_out_part (da, (uint8_t) (sa >> A_SHIFT)) << A_SHIFT;
+	    m = (xuint32_t)combine_disjoint_out_part (da, (xuint8_t) (sa >> 0));
+	    n = (xuint32_t)combine_disjoint_out_part (da, (xuint8_t) (sa >> G_SHIFT)) << G_SHIFT;
+	    o = (xuint32_t)combine_disjoint_out_part (da, (xuint8_t) (sa >> R_SHIFT)) << R_SHIFT;
+	    p = (xuint32_t)combine_disjoint_out_part (da, (xuint8_t) (sa >> A_SHIFT)) << A_SHIFT;
 	    Fb = m | n | o | p;
 	    break;
 
 	case COMBINE_B_IN:
-	    m = (uint32_t)combine_disjoint_in_part (da, (uint8_t) (sa >> 0));
-	    n = (uint32_t)combine_disjoint_in_part (da, (uint8_t) (sa >> G_SHIFT)) << G_SHIFT;
-	    o = (uint32_t)combine_disjoint_in_part (da, (uint8_t) (sa >> R_SHIFT)) << R_SHIFT;
-	    p = (uint32_t)combine_disjoint_in_part (da, (uint8_t) (sa >> A_SHIFT)) << A_SHIFT;
+	    m = (xuint32_t)combine_disjoint_in_part (da, (xuint8_t) (sa >> 0));
+	    n = (xuint32_t)combine_disjoint_in_part (da, (xuint8_t) (sa >> G_SHIFT)) << G_SHIFT;
+	    o = (xuint32_t)combine_disjoint_in_part (da, (xuint8_t) (sa >> R_SHIFT)) << R_SHIFT;
+	    p = (xuint32_t)combine_disjoint_in_part (da, (xuint8_t) (sa >> A_SHIFT)) << A_SHIFT;
 	    Fb = m | n | o | p;
 	    break;
 
@@ -2179,9 +2179,9 @@ combine_disjoint_general_ca (uint32_t *      dest,
 static void
 combine_disjoint_over_ca (pixman_implementation_t *imp,
                           pixman_op_t              op,
-                          uint32_t *                dest,
-                          const uint32_t *          src,
-                          const uint32_t *          mask,
+                          xuint32_t *                dest,
+                          const xuint32_t *          src,
+                          const xuint32_t *          mask,
                           int                      width)
 {
     combine_disjoint_general_ca (dest, src, mask, width, COMBINE_A_OVER);
@@ -2190,9 +2190,9 @@ combine_disjoint_over_ca (pixman_implementation_t *imp,
 static void
 combine_disjoint_in_ca (pixman_implementation_t *imp,
                         pixman_op_t              op,
-                        uint32_t *                dest,
-                        const uint32_t *          src,
-                        const uint32_t *          mask,
+                        xuint32_t *                dest,
+                        const xuint32_t *          src,
+                        const xuint32_t *          mask,
                         int                      width)
 {
     combine_disjoint_general_ca (dest, src, mask, width, COMBINE_A_IN);
@@ -2201,9 +2201,9 @@ combine_disjoint_in_ca (pixman_implementation_t *imp,
 static void
 combine_disjoint_in_reverse_ca (pixman_implementation_t *imp,
                                 pixman_op_t              op,
-                                uint32_t *                dest,
-                                const uint32_t *          src,
-                                const uint32_t *          mask,
+                                xuint32_t *                dest,
+                                const xuint32_t *          src,
+                                const xuint32_t *          mask,
                                 int                      width)
 {
     combine_disjoint_general_ca (dest, src, mask, width, COMBINE_B_IN);
@@ -2212,9 +2212,9 @@ combine_disjoint_in_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_disjoint_out_ca (pixman_implementation_t *imp,
                          pixman_op_t              op,
-                         uint32_t *                dest,
-                         const uint32_t *          src,
-                         const uint32_t *          mask,
+                         xuint32_t *                dest,
+                         const xuint32_t *          src,
+                         const xuint32_t *          mask,
                          int                      width)
 {
     combine_disjoint_general_ca (dest, src, mask, width, COMBINE_A_OUT);
@@ -2223,9 +2223,9 @@ combine_disjoint_out_ca (pixman_implementation_t *imp,
 static void
 combine_disjoint_out_reverse_ca (pixman_implementation_t *imp,
                                  pixman_op_t              op,
-                                 uint32_t *                dest,
-                                 const uint32_t *          src,
-                                 const uint32_t *          mask,
+                                 xuint32_t *                dest,
+                                 const xuint32_t *          src,
+                                 const xuint32_t *          mask,
                                  int                      width)
 {
     combine_disjoint_general_ca (dest, src, mask, width, COMBINE_B_OUT);
@@ -2234,9 +2234,9 @@ combine_disjoint_out_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_disjoint_atop_ca (pixman_implementation_t *imp,
                           pixman_op_t              op,
-                          uint32_t *                dest,
-                          const uint32_t *          src,
-                          const uint32_t *          mask,
+                          xuint32_t *                dest,
+                          const xuint32_t *          src,
+                          const xuint32_t *          mask,
                           int                      width)
 {
     combine_disjoint_general_ca (dest, src, mask, width, COMBINE_A_ATOP);
@@ -2245,9 +2245,9 @@ combine_disjoint_atop_ca (pixman_implementation_t *imp,
 static void
 combine_disjoint_atop_reverse_ca (pixman_implementation_t *imp,
                                   pixman_op_t              op,
-                                  uint32_t *                dest,
-                                  const uint32_t *          src,
-                                  const uint32_t *          mask,
+                                  xuint32_t *                dest,
+                                  const xuint32_t *          src,
+                                  const xuint32_t *          mask,
                                   int                      width)
 {
     combine_disjoint_general_ca (dest, src, mask, width, COMBINE_B_ATOP);
@@ -2256,31 +2256,31 @@ combine_disjoint_atop_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_disjoint_xor_ca (pixman_implementation_t *imp,
                          pixman_op_t              op,
-                         uint32_t *                dest,
-                         const uint32_t *          src,
-                         const uint32_t *          mask,
+                         xuint32_t *                dest,
+                         const xuint32_t *          src,
+                         const xuint32_t *          mask,
                          int                      width)
 {
     combine_disjoint_general_ca (dest, src, mask, width, COMBINE_XOR);
 }
 
 static void
-combine_conjoint_general_ca (uint32_t *      dest,
-                             const uint32_t *src,
-                             const uint32_t *mask,
+combine_conjoint_general_ca (xuint32_t *      dest,
+                             const xuint32_t *src,
+                             const xuint32_t *mask,
                              int            width,
-                             uint8_t        combine)
+                             xuint8_t        combine)
 {
     int i;
 
     for (i = 0; i < width; ++i)
     {
-	uint32_t s, d;
-	uint32_t m, n, o, p;
-	uint32_t Fa, Fb;
-	uint16_t t, u, v;
-	uint32_t sa;
-	uint8_t da;
+	xuint32_t s, d;
+	xuint32_t m, n, o, p;
+	xuint32_t Fa, Fb;
+	xuint16_t t, u, v;
+	xuint32_t sa;
+	xuint8_t da;
 
 	s = *(src + i);
 	m = *(mask + i);
@@ -2298,18 +2298,18 @@ combine_conjoint_general_ca (uint32_t *      dest,
 	    break;
 
 	case COMBINE_A_OUT:
-	    m = (uint32_t)combine_conjoint_out_part ((uint8_t) (sa >> 0), da);
-	    n = (uint32_t)combine_conjoint_out_part ((uint8_t) (sa >> G_SHIFT), da) << G_SHIFT;
-	    o = (uint32_t)combine_conjoint_out_part ((uint8_t) (sa >> R_SHIFT), da) << R_SHIFT;
-	    p = (uint32_t)combine_conjoint_out_part ((uint8_t) (sa >> A_SHIFT), da) << A_SHIFT;
+	    m = (xuint32_t)combine_conjoint_out_part ((xuint8_t) (sa >> 0), da);
+	    n = (xuint32_t)combine_conjoint_out_part ((xuint8_t) (sa >> G_SHIFT), da) << G_SHIFT;
+	    o = (xuint32_t)combine_conjoint_out_part ((xuint8_t) (sa >> R_SHIFT), da) << R_SHIFT;
+	    p = (xuint32_t)combine_conjoint_out_part ((xuint8_t) (sa >> A_SHIFT), da) << A_SHIFT;
 	    Fa = m | n | o | p;
 	    break;
 
 	case COMBINE_A_IN:
-	    m = (uint32_t)combine_conjoint_in_part ((uint8_t) (sa >> 0), da);
-	    n = (uint32_t)combine_conjoint_in_part ((uint8_t) (sa >> G_SHIFT), da) << G_SHIFT;
-	    o = (uint32_t)combine_conjoint_in_part ((uint8_t) (sa >> R_SHIFT), da) << R_SHIFT;
-	    p = (uint32_t)combine_conjoint_in_part ((uint8_t) (sa >> A_SHIFT), da) << A_SHIFT;
+	    m = (xuint32_t)combine_conjoint_in_part ((xuint8_t) (sa >> 0), da);
+	    n = (xuint32_t)combine_conjoint_in_part ((xuint8_t) (sa >> G_SHIFT), da) << G_SHIFT;
+	    o = (xuint32_t)combine_conjoint_in_part ((xuint8_t) (sa >> R_SHIFT), da) << R_SHIFT;
+	    p = (xuint32_t)combine_conjoint_in_part ((xuint8_t) (sa >> A_SHIFT), da) << A_SHIFT;
 	    Fa = m | n | o | p;
 	    break;
 
@@ -2325,18 +2325,18 @@ combine_conjoint_general_ca (uint32_t *      dest,
 	    break;
 
 	case COMBINE_B_OUT:
-	    m = (uint32_t)combine_conjoint_out_part (da, (uint8_t) (sa >> 0));
-	    n = (uint32_t)combine_conjoint_out_part (da, (uint8_t) (sa >> G_SHIFT)) << G_SHIFT;
-	    o = (uint32_t)combine_conjoint_out_part (da, (uint8_t) (sa >> R_SHIFT)) << R_SHIFT;
-	    p = (uint32_t)combine_conjoint_out_part (da, (uint8_t) (sa >> A_SHIFT)) << A_SHIFT;
+	    m = (xuint32_t)combine_conjoint_out_part (da, (xuint8_t) (sa >> 0));
+	    n = (xuint32_t)combine_conjoint_out_part (da, (xuint8_t) (sa >> G_SHIFT)) << G_SHIFT;
+	    o = (xuint32_t)combine_conjoint_out_part (da, (xuint8_t) (sa >> R_SHIFT)) << R_SHIFT;
+	    p = (xuint32_t)combine_conjoint_out_part (da, (xuint8_t) (sa >> A_SHIFT)) << A_SHIFT;
 	    Fb = m | n | o | p;
 	    break;
 
 	case COMBINE_B_IN:
-	    m = (uint32_t)combine_conjoint_in_part (da, (uint8_t) (sa >> 0));
-	    n = (uint32_t)combine_conjoint_in_part (da, (uint8_t) (sa >> G_SHIFT)) << G_SHIFT;
-	    o = (uint32_t)combine_conjoint_in_part (da, (uint8_t) (sa >> R_SHIFT)) << R_SHIFT;
-	    p = (uint32_t)combine_conjoint_in_part (da, (uint8_t) (sa >> A_SHIFT)) << A_SHIFT;
+	    m = (xuint32_t)combine_conjoint_in_part (da, (xuint8_t) (sa >> 0));
+	    n = (xuint32_t)combine_conjoint_in_part (da, (xuint8_t) (sa >> G_SHIFT)) << G_SHIFT;
+	    o = (xuint32_t)combine_conjoint_in_part (da, (xuint8_t) (sa >> R_SHIFT)) << R_SHIFT;
+	    p = (xuint32_t)combine_conjoint_in_part (da, (xuint8_t) (sa >> A_SHIFT)) << A_SHIFT;
 	    Fb = m | n | o | p;
 	    break;
 
@@ -2358,9 +2358,9 @@ combine_conjoint_general_ca (uint32_t *      dest,
 static void
 combine_conjoint_over_ca (pixman_implementation_t *imp,
                           pixman_op_t              op,
-                          uint32_t *                dest,
-                          const uint32_t *          src,
-                          const uint32_t *          mask,
+                          xuint32_t *                dest,
+                          const xuint32_t *          src,
+                          const xuint32_t *          mask,
                           int                      width)
 {
     combine_conjoint_general_ca (dest, src, mask, width, COMBINE_A_OVER);
@@ -2369,9 +2369,9 @@ combine_conjoint_over_ca (pixman_implementation_t *imp,
 static void
 combine_conjoint_over_reverse_ca (pixman_implementation_t *imp,
                                   pixman_op_t              op,
-                                  uint32_t *                dest,
-                                  const uint32_t *          src,
-                                  const uint32_t *          mask,
+                                  xuint32_t *                dest,
+                                  const xuint32_t *          src,
+                                  const xuint32_t *          mask,
                                   int                      width)
 {
     combine_conjoint_general_ca (dest, src, mask, width, COMBINE_B_OVER);
@@ -2380,9 +2380,9 @@ combine_conjoint_over_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_conjoint_in_ca (pixman_implementation_t *imp,
                         pixman_op_t              op,
-                        uint32_t *                dest,
-                        const uint32_t *          src,
-                        const uint32_t *          mask,
+                        xuint32_t *                dest,
+                        const xuint32_t *          src,
+                        const xuint32_t *          mask,
                         int                      width)
 {
     combine_conjoint_general_ca (dest, src, mask, width, COMBINE_A_IN);
@@ -2391,9 +2391,9 @@ combine_conjoint_in_ca (pixman_implementation_t *imp,
 static void
 combine_conjoint_in_reverse_ca (pixman_implementation_t *imp,
                                 pixman_op_t              op,
-                                uint32_t *                dest,
-                                const uint32_t *          src,
-                                const uint32_t *          mask,
+                                xuint32_t *                dest,
+                                const xuint32_t *          src,
+                                const xuint32_t *          mask,
                                 int                      width)
 {
     combine_conjoint_general_ca (dest, src, mask, width, COMBINE_B_IN);
@@ -2402,9 +2402,9 @@ combine_conjoint_in_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_conjoint_out_ca (pixman_implementation_t *imp,
                          pixman_op_t              op,
-                         uint32_t *                dest,
-                         const uint32_t *          src,
-                         const uint32_t *          mask,
+                         xuint32_t *                dest,
+                         const xuint32_t *          src,
+                         const xuint32_t *          mask,
                          int                      width)
 {
     combine_conjoint_general_ca (dest, src, mask, width, COMBINE_A_OUT);
@@ -2413,9 +2413,9 @@ combine_conjoint_out_ca (pixman_implementation_t *imp,
 static void
 combine_conjoint_out_reverse_ca (pixman_implementation_t *imp,
                                  pixman_op_t              op,
-                                 uint32_t *                dest,
-                                 const uint32_t *          src,
-                                 const uint32_t *          mask,
+                                 xuint32_t *                dest,
+                                 const xuint32_t *          src,
+                                 const xuint32_t *          mask,
                                  int                      width)
 {
     combine_conjoint_general_ca (dest, src, mask, width, COMBINE_B_OUT);
@@ -2424,9 +2424,9 @@ combine_conjoint_out_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_conjoint_atop_ca (pixman_implementation_t *imp,
                           pixman_op_t              op,
-                          uint32_t *                dest,
-                          const uint32_t *          src,
-                          const uint32_t *          mask,
+                          xuint32_t *                dest,
+                          const xuint32_t *          src,
+                          const xuint32_t *          mask,
                           int                      width)
 {
     combine_conjoint_general_ca (dest, src, mask, width, COMBINE_A_ATOP);
@@ -2435,9 +2435,9 @@ combine_conjoint_atop_ca (pixman_implementation_t *imp,
 static void
 combine_conjoint_atop_reverse_ca (pixman_implementation_t *imp,
                                   pixman_op_t              op,
-                                  uint32_t *                dest,
-                                  const uint32_t *          src,
-                                  const uint32_t *          mask,
+                                  xuint32_t *                dest,
+                                  const xuint32_t *          src,
+                                  const xuint32_t *          mask,
                                   int                      width)
 {
     combine_conjoint_general_ca (dest, src, mask, width, COMBINE_B_ATOP);
@@ -2446,9 +2446,9 @@ combine_conjoint_atop_reverse_ca (pixman_implementation_t *imp,
 static void
 combine_conjoint_xor_ca (pixman_implementation_t *imp,
                          pixman_op_t              op,
-                         uint32_t *                dest,
-                         const uint32_t *          src,
-                         const uint32_t *          mask,
+                         xuint32_t *                dest,
+                         const xuint32_t *          src,
+                         const xuint32_t *          mask,
                          int                      width)
 {
     combine_conjoint_general_ca (dest, src, mask, width, COMBINE_XOR);

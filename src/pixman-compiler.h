@@ -63,7 +63,7 @@
 #endif
 
 #ifndef SIZE_MAX
-# define SIZE_MAX               ((size_t)-1)
+# define SIZE_MAX               ((xsize_t)-1)
 #endif
 
 
@@ -101,7 +101,7 @@
 
 /* member offsets */
 #define CONTAINER_OF(type, member, data)				\
-    ((type *)(((uint8_t *)data) - offsetof (type, member)))
+    ((type *)(((xuint8_t *)data) - XOFFSETOF (type, member)))
 
 /* TLS */
 #if defined(PIXMAN_NO_TLS)
@@ -125,7 +125,7 @@
 
 #   define PIXMAN_DEFINE_THREAD_LOCAL(type, name)			\
     static volatile int tls_ ## name ## _initialized = 0;		\
-    static void *tls_ ## name ## _mutex = NULL;				\
+    static void *tls_ ## name ## _mutex = XNULL;				\
     static unsigned tls_ ## name ## _index;				\
 									\
     static type *							\
@@ -145,9 +145,9 @@
 	{								\
 	    if (!tls_ ## name ## _mutex)				\
 	    {								\
-		void *mutex = CreateMutexA (NULL, 0, NULL);		\
+        void *mutex = CreateMutexA (NULL, 0, XNULL);		\
 		if (InterlockedCompareExchangePointer (			\
-			&tls_ ## name ## _mutex, mutex, NULL) != NULL)	\
+            &tls_ ## name ## _mutex, mutex, XNULL) != XNULL)	\
 		{							\
 		    CloseHandle (mutex);				\
 		}							\
@@ -161,7 +161,7 @@
 	    ReleaseMutex (tls_ ## name ## _mutex);			\
 	}								\
 	if (tls_ ## name ## _index == 0xFFFFFFFF)			\
-	    return NULL;						\
+        return XNULL;						\
 	value = TlsGetValue (tls_ ## name ## _index);			\
 	if (!value)							\
 	    value = tls_ ## name ## _alloc ();				\
@@ -189,7 +189,7 @@
     static void								\
     tls_ ## name ## _destroy_value (void *value)			\
     {									\
-	free (value);							\
+    xmemory_free (value);							\
     }									\
 									\
     static void								\
@@ -202,7 +202,7 @@
     static type *							\
     tls_ ## name ## _alloc (void)					\
     {									\
-	type *value = calloc (1, sizeof (type));			\
+    type *value = xmemory_calloc (1, sizeof (type));			\
 	if (value)							\
 	    pthread_setspecific (tls_ ## name ## _key, value);		\
 	return value;							\
@@ -211,7 +211,7 @@
     static force_inline type *						\
     tls_ ## name ## _get (void)						\
     {									\
-	type *value = NULL;						\
+    type *value = XNULL;						\
 	if (pthread_once (&tls_ ## name ## _once_control,		\
 			  tls_ ## name ## _make_key) == 0)		\
 	{								\
