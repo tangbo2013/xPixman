@@ -9,9 +9,13 @@ QT       -= gui
 TARGET = xPixman
 TEMPLATE = lib
 CONFIG += staticlib
+INCLUDEPATH += ../../../
 
 DEFINES += PACKAGE
-DEFINES += HAVE_PTHREADS
+DEFINES += PIXMAN_NO_TLS
+
+QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare
+QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare
 
 unix:!symbian {
     maemo5 {
@@ -49,23 +53,15 @@ OTHER_FILES += \
 
 SOURCES += \
     ../pixman.c \
-    ../pixman-x86.c \
-    ../pixman-vmx.c \
     ../pixman-utils.c \
     ../pixman-trap.c \
     ../pixman-timer.c \
-    ../pixman-ssse3.c \
-    ../pixman-sse2.c \
     ../pixman-solid-fill.c \
     ../pixman-region32.c \
     ../pixman-region16.c \
     ../pixman-region.c \
     ../pixman-radial-gradient.c \
-    ../pixman-ppc.c \
     ../pixman-noop.c \
-    ../pixman-mmx.c \
-    ../pixman-mips.c \
-    ../pixman-mips-dspr2.c \
     ../pixman-matrix.c \
     ../pixman-linear-gradient.c \
     ../pixman-implementation.c \

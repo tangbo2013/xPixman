@@ -26,7 +26,7 @@
 #endif
 #include "pixman-private.h"
 
-static uint32_t
+static xuint32_t
 color_to_uint32 (const pixman_color_t *color)
 {
     return
@@ -55,7 +55,7 @@ pixman_image_create_solid_fill (const pixman_color_t *color)
     pixman_image_t *img = _pixman_image_allocate ();
 
     if (!img)
-	return NULL;
+	return XNULL;
 
     img->type = SOLID;
     img->solid.color = *color;

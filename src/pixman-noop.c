@@ -24,8 +24,8 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <string.h>
-#include <stdlib.h>
+#include <xClib/string.h>
+#include <xC/xmemory.h>
 #include "pixman-private.h"
 #include "pixman-combine32.h"
 #include "pixman-inlines.h"
@@ -37,10 +37,10 @@ noop_composite (pixman_implementation_t *imp,
     return;
 }
 
-static uint32_t *
-noop_get_scanline (pixman_iter_t *iter, const uint32_t *mask)
+static xuint32_t *
+noop_get_scanline (pixman_iter_t *iter, const xuint32_t *mask)
 {
-    uint32_t *result = iter->buffer;
+    xuint32_t *result = iter->buffer;
 
     iter->buffer += iter->image->bits.rowstride;
 
@@ -52,9 +52,9 @@ noop_init_solid_narrow (pixman_iter_t *iter,
 			const pixman_iter_info_t *info)
 { 
     pixman_image_t *image = iter->image;
-    uint32_t *buffer = iter->buffer;
-    uint32_t *end = buffer + iter->width;
-    uint32_t color;
+    xuint32_t *buffer = iter->buffer;
+    xuint32_t *end = buffer + iter->width;
+    xuint32_t color;
 
     if (iter->image->type == SOLID)
 	color = image->solid.color_32;
@@ -103,21 +103,21 @@ static const pixman_iter_info_t noop_iters[] =
     /* Source iters */
     { PIXMAN_any,
       0, ITER_IGNORE_ALPHA | ITER_IGNORE_RGB | ITER_SRC,
-      NULL,
+      XNULL,
       _pixman_iter_get_scanline_noop,
-      NULL
+      XNULL
     },
     { PIXMAN_solid,
       FAST_PATH_NO_ALPHA_MAP, ITER_NARROW | ITER_SRC,
       noop_init_solid_narrow,
       _pixman_iter_get_scanline_noop,
-      NULL,
+      XNULL,
     },
     { PIXMAN_solid,
       FAST_PATH_NO_ALPHA_MAP, ITER_WIDE | ITER_SRC,
       noop_init_solid_wide,
       _pixman_iter_get_scanline_noop,
-      NULL
+      XNULL
     },
     { PIXMAN_a8r8g8b8,
       FAST_PATH_STANDARD_FLAGS | FAST_PATH_ID_TRANSFORM |
@@ -125,7 +125,7 @@ static const pixman_iter_info_t noop_iters[] =
       ITER_NARROW | ITER_SRC,
       noop_init_direct_buffer,
       noop_get_scanline,
-      NULL
+      XNULL
     },
     /* Dest iters */
     { PIXMAN_a8r8g8b8,

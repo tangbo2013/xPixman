@@ -29,7 +29,7 @@
 #endif
 #include "pixman-private.h"
 
-#include <stdlib.h>
+#include <xC/xmemory.h>
 
 typedef struct glyph_metrics_t glyph_metrics_t;
 typedef struct glyph_t glyph_t;
@@ -67,13 +67,13 @@ free_glyph (glyph_t *glyph)
 {
     pixman_list_unlink (&glyph->mru_link);
     pixman_image_unref (glyph->image);
-    free (glyph);
+    xmemory_free (glyph);
 }
 
 static unsigned int
 hash (const void *font_key, const void *glyph_key)
 {
-    size_t key = (size_t)font_key + (size_t)glyph_key;
+    xsize_t key = (xsize_t)font_key + (xsize_t)glyph_key;
 
     /* This hash function is based on one found on Thomas Wang's
      * web page at
@@ -110,7 +110,7 @@ lookup_glyph (pixman_glyph_cache_t *cache,
 	}
     }
 
-    return NULL;
+    return XNULL;
 }
 
 static void
@@ -152,11 +152,11 @@ remove_glyph (pixman_glyph_cache_t *cache,
     cache->n_glyphs--;
 
     /* Eliminate tombstones if possible */
-    if (cache->glyphs[(idx + 1) & HASH_MASK] == NULL)
+    if (cache->glyphs[(idx + 1) & HASH_MASK] == XNULL)
     {
 	while (cache->glyphs[idx & HASH_MASK] == TOMBSTONE)
 	{
-	    cache->glyphs[idx & HASH_MASK] = NULL;
+	    cache->glyphs[idx & HASH_MASK] = XNULL;
 	    cache->n_tombstones--;
 	    idx--;
 	}
@@ -175,7 +175,7 @@ clear_table (pixman_glyph_cache_t *cache)
 	if (glyph && glyph != TOMBSTONE)
 	    free_glyph (glyph);
 
-	cache->glyphs[i] = NULL;
+	cache->glyphs[i] = XNULL;
     }
 
     cache->n_glyphs = 0;
@@ -187,10 +187,10 @@ pixman_glyph_cache_create (void)
 {
     pixman_glyph_cache_t *cache;
 
-    if (!(cache = malloc (sizeof *cache)))
-	return NULL;
+    if (!(cache = xmemory_alloc (sizeof *cache)))
+	return XNULL;
 
-    memset (cache->glyphs, 0, sizeof (cache->glyphs));
+    xmemory_set (cache->glyphs, 0, sizeof (cache->glyphs));
     cache->n_glyphs = 0;
     cache->n_tombstones = 0;
     cache->freeze_count = 0;
@@ -207,7 +207,7 @@ pixman_glyph_cache_destroy (pixman_glyph_cache_t *cache)
 
     clear_table (cache);
 
-    free (cache);
+    xmemory_free (cache);
 }
 
 PIXMAN_EXPORT void
@@ -257,19 +257,19 @@ pixman_glyph_cache_insert (pixman_glyph_cache_t  *cache,
 			   pixman_image_t        *image)
 {
     glyph_t *glyph;
-    int32_t width, height;
+    xint32_t width, height;
 
-    return_val_if_fail (cache->freeze_count > 0, NULL);
-    return_val_if_fail (image->type == BITS, NULL);
+    return_val_if_fail (cache->freeze_count > 0, XNULL);
+    return_val_if_fail (image->type == BITS, XNULL);
 
     width = image->bits.width;
     height = image->bits.height;
 
     if (cache->n_glyphs >= HASH_SIZE)
-	return NULL;
+	return XNULL;
 
-    if (!(glyph = malloc (sizeof *glyph)))
-	return NULL;
+    if (!(glyph = xmemory_alloc (sizeof *glyph)))
+	return XNULL;
 
     glyph->font_key = font_key;
     glyph->glyph_key = glyph_key;
@@ -277,14 +277,14 @@ pixman_glyph_cache_insert (pixman_glyph_cache_t  *cache,
     glyph->origin_y = origin_y;
 
     if (!(glyph->image = pixman_image_create_bits (
-	      image->bits.format, width, height, NULL, -1)))
+	      image->bits.format, width, height, XNULL, -1)))
     {
-	free (glyph);
-	return NULL;
+    xmemory_free (glyph);
+	return XNULL;
     }
 
     pixman_image_composite32 (PIXMAN_OP_SRC,
-			      image, NULL, glyph->image, 0, 0, 0, 0, 0, 0,
+			      image, XNULL, glyph->image, 0, 0, 0, 0, 0, 0,
 			      width, height);
 
     if (PIXMAN_FORMAT_A   (glyph->image->bits.format) != 0	&&
@@ -398,21 +398,21 @@ PIXMAN_EXPORT void
 pixman_composite_glyphs_no_mask (pixman_op_t            op,
 				 pixman_image_t        *src,
 				 pixman_image_t        *dest,
-				 int32_t                src_x,
-				 int32_t                src_y,
-				 int32_t                dest_x,
-				 int32_t                dest_y,
+				 xint32_t                src_x,
+				 xint32_t                src_y,
+				 xint32_t                dest_x,
+				 xint32_t                dest_y,
 				 pixman_glyph_cache_t  *cache,
 				 int                    n_glyphs,
 				 const pixman_glyph_t  *glyphs)
 {
     pixman_region32_t region;
     pixman_format_code_t glyph_format = PIXMAN_null;
-    uint32_t glyph_flags = 0;
+    xuint32_t glyph_flags = 0;
     pixman_format_code_t dest_format;
-    uint32_t dest_flags;
-    pixman_composite_func_t func = NULL;
-    pixman_implementation_t *implementation = NULL;
+    xuint32_t dest_flags;
+    pixman_composite_func_t func = XNULL;
+    pixman_implementation_t *implementation = XNULL;
     pixman_composite_info_t info;
     int i;
 
@@ -425,7 +425,7 @@ pixman_composite_glyphs_no_mask (pixman_op_t            op,
     pixman_region32_init (&region);
     if (!_pixman_compute_composite_region32 (
 	    &region,
-	    src, NULL, dest,
+	    src, XNULL, dest,
 	    src_x - dest_x, src_y - dest_y, 0, 0, 0, 0,
 	    dest->bits.width, dest->bits.height))
     {
@@ -444,7 +444,7 @@ pixman_composite_glyphs_no_mask (pixman_op_t            op,
 	pixman_image_t *glyph_img = glyph->image;
 	pixman_box32_t glyph_box;
 	pixman_box32_t *pbox;
-	uint32_t extra = FAST_PATH_SAMPLES_COVER_CLIP_NEAREST;
+	xuint32_t extra = FAST_PATH_SAMPLES_COVER_CLIP_NEAREST;
 	pixman_box32_t composite_box;
 	int n;
 
@@ -505,14 +505,14 @@ add_glyphs (pixman_glyph_cache_t *cache,
 	    int n_glyphs, const pixman_glyph_t *glyphs)
 {
     pixman_format_code_t glyph_format = PIXMAN_null;
-    uint32_t glyph_flags = 0;
-    pixman_composite_func_t func = NULL;
-    pixman_implementation_t *implementation = NULL;
+    xuint32_t glyph_flags = 0;
+    pixman_composite_func_t func = XNULL;
+    pixman_implementation_t *implementation = XNULL;
     pixman_format_code_t dest_format;
-    uint32_t dest_flags;
+    xuint32_t dest_flags;
     pixman_box32_t dest_box;
     pixman_composite_info_t info;
-    pixman_image_t *white_img = NULL;
+    pixman_image_t *white_img = XNULL;
     pixman_bool_t white_src = FALSE;
     int i;
 
@@ -553,7 +553,7 @@ add_glyphs (pixman_glyph_cache_t *cache,
 		mask_format = PIXMAN_null;
 		info.src_flags = glyph_flags | FAST_PATH_SAMPLES_COVER_CLIP_NEAREST;
 		info.mask_flags = FAST_PATH_IS_OPAQUE;
-		info.mask_image = NULL;
+		info.mask_image = XNULL;
 		white_src = FALSE;
 	    }
 	    else
@@ -641,21 +641,21 @@ pixman_composite_glyphs (pixman_op_t            op,
 			 pixman_image_t        *src,
 			 pixman_image_t        *dest,
 			 pixman_format_code_t   mask_format,
-			 int32_t                src_x,
-			 int32_t                src_y,
-			 int32_t		mask_x,
-			 int32_t		mask_y,
-			 int32_t                dest_x,
-			 int32_t                dest_y,
-			 int32_t                width,
-			 int32_t                height,
+			 xint32_t                src_x,
+			 xint32_t                src_y,
+			 xint32_t		mask_x,
+			 xint32_t		mask_y,
+			 xint32_t                dest_x,
+			 xint32_t                dest_y,
+			 xint32_t                width,
+			 xint32_t                height,
 			 pixman_glyph_cache_t  *cache,
 			 int			n_glyphs,
 			 const pixman_glyph_t  *glyphs)
 {
     pixman_image_t *mask;
 
-    if (!(mask = pixman_image_create_bits (mask_format, width, height, NULL, -1)))
+    if (!(mask = pixman_image_create_bits (mask_format, width, height, XNULL, -1)))
 	return;
 
     if (PIXMAN_FORMAT_A   (mask_format) != 0 &&

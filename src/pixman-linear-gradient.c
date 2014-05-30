@@ -28,7 +28,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdlib.h>
+#include <xC/xmemory.h>
 #include "pixman-private.h"
 
 static pixman_bool_t
@@ -88,22 +88,22 @@ linear_gradient_is_horizontal (pixman_image_t *image,
     return FALSE;
 }
 
-static uint32_t *
+static xuint32_t *
 linear_get_scanline_narrow (pixman_iter_t  *iter,
-			    const uint32_t *mask)
+			    const xuint32_t *mask)
 {
     pixman_image_t *image  = iter->image;
     int             x      = iter->x;
     int             y      = iter->y;
     int             width  = iter->width;
-    uint32_t *      buffer = iter->buffer;
+    xuint32_t *      buffer = iter->buffer;
 
     pixman_vector_t v, unit;
     pixman_fixed_32_32_t l;
     pixman_fixed_48_16_t dx, dy;
     gradient_t *gradient = (gradient_t *)image;
     linear_gradient_t *linear = (linear_gradient_t *)image;
-    uint32_t *end = buffer + width;
+    xuint32_t *end = buffer + width;
     pixman_gradient_walker_t walker;
 
     _pixman_gradient_walker_init (&walker, gradient, image->common.repeat);
@@ -160,7 +160,7 @@ linear_get_scanline_narrow (pixman_iter_t  *iter,
 
 	if (((pixman_fixed_32_32_t )(inc * width)) == 0)
 	{
-	    register uint32_t color;
+	    register xuint32_t color;
 
 	    color = _pixman_gradient_walker_pixel (&walker, t);
 	    while (buffer < end)
@@ -222,10 +222,10 @@ linear_get_scanline_narrow (pixman_iter_t  *iter,
     return iter->buffer;
 }
 
-static uint32_t *
-linear_get_scanline_wide (pixman_iter_t *iter, const uint32_t *mask)
+static xuint32_t *
+linear_get_scanline_wide (pixman_iter_t *iter, const xuint32_t *mask)
 {
-    uint32_t *buffer = linear_get_scanline_narrow (iter, NULL);
+    xuint32_t *buffer = linear_get_scanline_narrow (iter, XNULL);
 
     pixman_expand_to_float (
 	(argb_t *)buffer, buffer, PIXMAN_a8r8g8b8, iter->width);
@@ -240,9 +240,9 @@ _pixman_linear_gradient_iter_init (pixman_image_t *image, pixman_iter_t  *iter)
 	    iter->image, iter->x, iter->y, iter->width, iter->height))
     {
 	if (iter->iter_flags & ITER_NARROW)
-	    linear_get_scanline_narrow (iter, NULL);
+	    linear_get_scanline_narrow (iter, XNULL);
 	else
-	    linear_get_scanline_wide (iter, NULL);
+	    linear_get_scanline_wide (iter, XNULL);
 
 	iter->get_scanline = _pixman_iter_get_scanline_noop;
     }
@@ -267,14 +267,14 @@ pixman_image_create_linear_gradient (const pixman_point_fixed_t *  p1,
     image = _pixman_image_allocate ();
 
     if (!image)
-	return NULL;
+	return XNULL;
 
     linear = &image->linear;
 
     if (!_pixman_init_gradient (&linear->common, stops, n_stops))
     {
-	free (image);
-	return NULL;
+    xmemory_free (image);
+	return XNULL;
     }
 
     linear->p1 = *p1;

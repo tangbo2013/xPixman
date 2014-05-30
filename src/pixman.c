@@ -28,7 +28,7 @@
 #endif
 #include "pixman-private.h"
 
-#include <stdlib.h>
+#include <xC/xmemory.h>
 
 pixman_implementation_t *global_implementation;
 
@@ -44,14 +44,14 @@ typedef struct operator_info_t operator_info_t;
 
 struct operator_info_t
 {
-    uint8_t	opaque_info[4];
+    xuint8_t	opaque_info[4];
 };
 
 #define PACK(neither, src, dest, both)			\
-    {{	    (uint8_t)PIXMAN_OP_ ## neither,		\
-	    (uint8_t)PIXMAN_OP_ ## src,			\
-	    (uint8_t)PIXMAN_OP_ ## dest,		\
-	    (uint8_t)PIXMAN_OP_ ## both		}}
+    {{	    (xuint8_t)PIXMAN_OP_ ## neither,		\
+	    (xuint8_t)PIXMAN_OP_ ## src,			\
+	    (xuint8_t)PIXMAN_OP_ ## dest,		\
+	    (xuint8_t)PIXMAN_OP_ ## both		}}
 
 static const operator_info_t operator_table[] =
 {
@@ -133,9 +133,9 @@ static const operator_info_t operator_table[] =
  */
 static pixman_op_t
 optimize_operator (pixman_op_t     op,
-		   uint32_t        src_flags,
-		   uint32_t        mask_flags,
-		   uint32_t        dst_flags)
+		   xuint32_t        src_flags,
+		   xuint32_t        mask_flags,
+		   xuint32_t        dst_flags)
 {
     pixman_bool_t is_source_opaque, is_dest_opaque;
 
@@ -164,8 +164,8 @@ clip_general_image (pixman_region32_t * region,
     if (pixman_region32_n_rects (region) == 1 &&
         pixman_region32_n_rects (clip) == 1)
     {
-	pixman_box32_t *  rbox = pixman_region32_rectangles (region, NULL);
-	pixman_box32_t *  cbox = pixman_region32_rectangles (clip, NULL);
+    pixman_box32_t *  rbox = pixman_region32_rectangles (region, XNULL);
+    pixman_box32_t *  cbox = pixman_region32_rectangles (clip, XNULL);
 	int v;
 
 	if (rbox->x1 < (v = cbox->x1 + dx))
@@ -229,14 +229,14 @@ _pixman_compute_composite_region32 (pixman_region32_t * region,
 				    pixman_image_t *    src_image,
 				    pixman_image_t *    mask_image,
 				    pixman_image_t *    dest_image,
-				    int32_t             src_x,
-				    int32_t             src_y,
-				    int32_t             mask_x,
-				    int32_t             mask_y,
-				    int32_t             dest_x,
-				    int32_t             dest_y,
-				    int32_t             width,
-				    int32_t             height)
+				    xint32_t             src_x,
+				    xint32_t             src_y,
+				    xint32_t             mask_x,
+				    xint32_t             mask_y,
+				    xint32_t             dest_x,
+				    xint32_t             dest_y,
+				    xint32_t             width,
+				    xint32_t             height)
 {
     region->extents.x1 = dest_x;
     region->extents.x2 = dest_x + width;
@@ -400,7 +400,7 @@ compute_transformed_extents (pixman_transform_t *transform,
 static pixman_bool_t
 analyze_extent (pixman_image_t       *image,
 		const pixman_box32_t *extents,
-		uint32_t             *flags)
+		xuint32_t             *flags)
 {
     pixman_transform_t *transform;
     pixman_fixed_t x_off, y_off;
@@ -571,14 +571,14 @@ pixman_image_composite32 (pixman_op_t      op,
                           pixman_image_t * src,
                           pixman_image_t * mask,
                           pixman_image_t * dest,
-                          int32_t          src_x,
-                          int32_t          src_y,
-                          int32_t          mask_x,
-                          int32_t          mask_y,
-                          int32_t          dest_x,
-                          int32_t          dest_y,
-                          int32_t          width,
-                          int32_t          height)
+                          xint32_t          src_x,
+                          xint32_t          src_y,
+                          xint32_t          mask_x,
+                          xint32_t          mask_y,
+                          xint32_t          dest_x,
+                          xint32_t          dest_y,
+                          xint32_t          width,
+                          xint32_t          height)
 {
     pixman_format_code_t src_format, mask_format, dest_format;
     pixman_region32_t region;
@@ -718,22 +718,22 @@ pixman_image_composite (pixman_op_t      op,
                         pixman_image_t * src,
                         pixman_image_t * mask,
                         pixman_image_t * dest,
-                        int16_t          src_x,
-                        int16_t          src_y,
-                        int16_t          mask_x,
-                        int16_t          mask_y,
-                        int16_t          dest_x,
-                        int16_t          dest_y,
-                        uint16_t         width,
-                        uint16_t         height)
+                        xint16_t          src_x,
+                        xint16_t          src_y,
+                        xint16_t          mask_x,
+                        xint16_t          mask_y,
+                        xint16_t          dest_x,
+                        xint16_t          dest_y,
+                        xuint16_t         width,
+                        xuint16_t         height)
 {
     pixman_image_composite32 (op, src, mask, dest, src_x, src_y, 
                               mask_x, mask_y, dest_x, dest_y, width, height);
 }
 
 PIXMAN_EXPORT pixman_bool_t
-pixman_blt (uint32_t *src_bits,
-            uint32_t *dst_bits,
+pixman_blt (xuint32_t *src_bits,
+            xuint32_t *dst_bits,
             int       src_stride,
             int       dst_stride,
             int       src_bpp,
@@ -754,20 +754,20 @@ pixman_blt (uint32_t *src_bits,
 }
 
 PIXMAN_EXPORT pixman_bool_t
-pixman_fill (uint32_t *bits,
+pixman_fill (xuint32_t *bits,
              int       stride,
              int       bpp,
              int       x,
              int       y,
              int       width,
              int       height,
-             uint32_t  filler)
+             xuint32_t  filler)
 {
     return _pixman_implementation_fill (
 	get_implementation(), bits, stride, bpp, x, y, width, height, filler);
 }
 
-static uint32_t
+static xuint32_t
 color_to_uint32 (const pixman_color_t *color)
 {
     return
@@ -779,10 +779,10 @@ color_to_uint32 (const pixman_color_t *color)
 
 static pixman_bool_t
 color_to_pixel (const pixman_color_t *color,
-                uint32_t *            pixel,
+                xuint32_t *            pixel,
                 pixman_format_code_t  format)
 {
-    uint32_t c = color_to_uint32 (color);
+    xuint32_t c = color_to_uint32 (color);
 
     if (!(format == PIXMAN_a8r8g8b8     ||
           format == PIXMAN_x8r8g8b8     ||
@@ -849,7 +849,7 @@ pixman_image_fill_rectangles (pixman_op_t                 op,
     if (n_rects > 6)
     {
         boxes = pixman_malloc_ab (sizeof (pixman_box32_t), n_rects);
-        if (boxes == NULL)
+        if (boxes == XNULL)
             return FALSE;
     }
     else
@@ -868,7 +868,7 @@ pixman_image_fill_rectangles (pixman_op_t                 op,
     result = pixman_image_fill_boxes (op, dest, color, n_rects, boxes);
 
     if (boxes != stack_boxes)
-        free (boxes);
+        xmemory_free (boxes);
     
     return result;
 }
@@ -906,7 +906,7 @@ pixman_image_fill_boxes (pixman_op_t           op,
 
     if (op == PIXMAN_OP_SRC)
     {
-        uint32_t pixel;
+        xuint32_t pixel;
 
         if (color_to_pixel (color, &pixel, dest->bits.format))
         {
@@ -947,7 +947,7 @@ pixman_image_fill_boxes (pixman_op_t           op,
     {
         const pixman_box32_t *box = &(boxes[i]);
 
-        pixman_image_composite32 (op, solid, NULL, dest,
+        pixman_image_composite32 (op, solid, XNULL, dest,
                                   0, 0, 0, 0,
                                   box->x1, box->y1,
                                   box->x2 - box->x1, box->y2 - box->y1);
@@ -1105,14 +1105,14 @@ pixman_compute_composite_region (pixman_region16_t * region,
                                  pixman_image_t *    src_image,
                                  pixman_image_t *    mask_image,
                                  pixman_image_t *    dest_image,
-                                 int16_t             src_x,
-                                 int16_t             src_y,
-                                 int16_t             mask_x,
-                                 int16_t             mask_y,
-                                 int16_t             dest_x,
-                                 int16_t             dest_y,
-                                 uint16_t            width,
-                                 uint16_t            height)
+                                 xint16_t             src_x,
+                                 xint16_t             src_y,
+                                 xint16_t             mask_x,
+                                 xint16_t             mask_y,
+                                 xint16_t             dest_x,
+                                 xint16_t             dest_y,
+                                 xuint16_t            width,
+                                 xuint16_t            height)
 {
     pixman_region32_t r32;
     pixman_bool_t retval;

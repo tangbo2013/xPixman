@@ -23,11 +23,10 @@
  *
  * Author: Soren Sandmann <soren.sandmann@gmail.com>
  */
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <assert.h>
+#include <xClib/string.h>
+#include <xC/xmemory.h>
+#include <xClib/math.h>
+#include <xC/xdebug.h>
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -179,12 +178,12 @@ integral (pixman_kernel_t kernel1, double x1,
     }
     else if (kernel1 == PIXMAN_KERNEL_IMPULSE)
     {
-	assert (width == 0.0);
+    XASSERT (width == 0.0);
 	return filters[kernel2].func (x2 * scale);
     }
     else if (kernel2 == PIXMAN_KERNEL_IMPULSE)
     {
-	assert (width == 0.0);
+    XASSERT (width == 0.0);
 	return filters[kernel1].func (x1);
     }
     else
@@ -232,9 +231,9 @@ create_1d_filter (int             *width,
     size = scale * filters[sample].width + filters[reconstruct].width;
     *width = ceil (size);
 
-    p = params = malloc (*width * n_phases * sizeof (pixman_fixed_t));
+    p = params = xmemory_alloc (*width * n_phases * sizeof (pixman_fixed_t));
     if (!params)
-        return NULL;
+        return XNULL;
 
     step = 1.0 / n_phases;
 
@@ -313,7 +312,7 @@ pixman_filter_create_separable_convolution (int             *n_values,
 {
     double sx = fabs (pixman_fixed_to_double (scale_x));
     double sy = fabs (pixman_fixed_to_double (scale_y));
-    pixman_fixed_t *horz = NULL, *vert = NULL, *params = NULL;
+    pixman_fixed_t *horz = XNULL, *vert = XNULL, *params = XNULL;
     int subsample_x, subsample_y;
     int width, height;
 
@@ -328,7 +327,7 @@ pixman_filter_create_separable_convolution (int             *n_values,
     
     *n_values = 4 + width * subsample_x + height * subsample_y;
     
-    params = malloc (*n_values * sizeof (pixman_fixed_t));
+    params = xmemory_alloc (*n_values * sizeof (pixman_fixed_t));
     if (!params)
         goto out;
 
@@ -337,14 +336,14 @@ pixman_filter_create_separable_convolution (int             *n_values,
     params[2] = pixman_int_to_fixed (subsample_bits_x);
     params[3] = pixman_int_to_fixed (subsample_bits_y);
 
-    memcpy (params + 4, horz,
+    xmemory_copy (params + 4, horz,
 	    width * subsample_x * sizeof (pixman_fixed_t));
-    memcpy (params + 4 + width * subsample_x, vert,
+    xmemory_copy (params + 4 + width * subsample_x, vert,
 	    height * subsample_y * sizeof (pixman_fixed_t));
 
 out:
-    free (horz);
-    free (vert);
+    xmemory_free (horz);
+    xmemory_free (vert);
 
     return params;
 }

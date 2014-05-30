@@ -23,8 +23,7 @@
 #include <config.h>
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <xC/xmemory.h>
 #include "pixman-private.h"
 
 #ifdef PIXMAN_TIMERS
@@ -36,7 +35,7 @@ dump_timers (void)
 {
     pixman_timer_t *timer;
 
-    for (timer = timers; timer != NULL; timer = timer->next)
+    for (timer = timers; timer != XNULL; timer = timer->next)
     {
 	printf ("%s:   total: %llu     n: %llu      avg: %f\n",
 	        timer->name,

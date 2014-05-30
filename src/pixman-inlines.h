@@ -90,13 +90,13 @@ pixman_fixed_to_bilinear_weight (pixman_fixed_t x)
 
 #if BILINEAR_INTERPOLATION_BITS <= 4
 /* Inspired by Filter_32_opaque from Skia */
-static force_inline uint32_t
-bilinear_interpolation (uint32_t tl, uint32_t tr,
-			uint32_t bl, uint32_t br,
+static force_inline xuint32_t
+bilinear_interpolation (xuint32_t tl, xuint32_t tr,
+			xuint32_t bl, xuint32_t br,
 			int distx, int disty)
 {
     int distxy, distxiy, distixy, distixiy;
-    uint32_t lo, hi;
+    xuint32_t lo, hi;
 
     distx <<= (4 - BILINEAR_INTERPOLATION_BITS);
     disty <<= (4 - BILINEAR_INTERPOLATION_BITS);
@@ -126,14 +126,14 @@ bilinear_interpolation (uint32_t tl, uint32_t tr,
 #else
 #if SIZEOF_LONG > 4
 
-static force_inline uint32_t
-bilinear_interpolation (uint32_t tl, uint32_t tr,
-			uint32_t bl, uint32_t br,
+static force_inline xuint32_t
+bilinear_interpolation (xuint32_t tl, xuint32_t tr,
+			xuint32_t bl, xuint32_t br,
 			int distx, int disty)
 {
-    uint64_t distxy, distxiy, distixy, distixiy;
-    uint64_t tl64, tr64, bl64, br64;
-    uint64_t f, r;
+    xuint64_t distxy, distxiy, distixy, distixiy;
+    xuint64_t tl64, tr64, bl64, br64;
+    xuint64_t f, r;
 
     distx <<= (8 - BILINEAR_INTERPOLATION_BITS);
     disty <<= (8 - BILINEAR_INTERPOLATION_BITS);
@@ -168,18 +168,18 @@ bilinear_interpolation (uint32_t tl, uint32_t tr,
     f = tl64 * distixiy + tr64 * distxiy + bl64 * distixy + br64 * distxy;
     r |= ((f >> 16) & 0x000000ff00000000ull) | (f & 0xff000000ull);
 
-    return (uint32_t)(r >> 16);
+    return (xuint32_t)(r >> 16);
 }
 
 #else
 
-static force_inline uint32_t
-bilinear_interpolation (uint32_t tl, uint32_t tr,
-			uint32_t bl, uint32_t br,
+static force_inline xuint32_t
+bilinear_interpolation (xuint32_t tl, xuint32_t tr,
+			xuint32_t bl, xuint32_t br,
 			int distx, int disty)
 {
     int distxy, distxiy, distixy, distixiy;
-    uint32_t f, r;
+    xuint32_t f, r;
 
     distx <<= (8 - BILINEAR_INTERPOLATION_BITS);
     disty <<= (8 - BILINEAR_INTERPOLATION_BITS);
@@ -235,18 +235,18 @@ bilinear_interpolation (uint32_t tl, uint32_t tr,
  *       may need its own correctness test and performance tuning.
  */
 static force_inline void
-pad_repeat_get_scanline_bounds (int32_t         source_image_width,
+pad_repeat_get_scanline_bounds (xint32_t         source_image_width,
 				pixman_fixed_t  vx,
 				pixman_fixed_t  unit_x,
-				int32_t *       width,
-				int32_t *       left_pad,
-				int32_t *       right_pad)
+				xint32_t *       width,
+				xint32_t *       left_pad,
+				xint32_t *       right_pad)
 {
-    int64_t max_vx = (int64_t) source_image_width << 16;
-    int64_t tmp;
+    xint64_t max_vx = (xint64_t) source_image_width << 16;
+    xint64_t tmp;
     if (vx < 0)
     {
-	tmp = ((int64_t) unit_x - 1 - vx) / unit_x;
+	tmp = ((xint64_t) unit_x - 1 - vx) / unit_x;
 	if (tmp > *width)
 	{
 	    *left_pad = *width;
@@ -254,15 +254,15 @@ pad_repeat_get_scanline_bounds (int32_t         source_image_width,
 	}
 	else
 	{
-	    *left_pad = (int32_t) tmp;
-	    *width -= (int32_t) tmp;
+	    *left_pad = (xint32_t) tmp;
+	    *width -= (xint32_t) tmp;
 	}
     }
     else
     {
 	*left_pad = 0;
     }
-    tmp = ((int64_t) unit_x - 1 - vx + max_vx) / unit_x - *left_pad;
+    tmp = ((xint64_t) unit_x - 1 - vx + max_vx) / unit_x - *left_pad;
     if (tmp < 0)
     {
 	*right_pad = *width;
@@ -274,8 +274,8 @@ pad_repeat_get_scanline_bounds (int32_t         source_image_width,
     }
     else
     {
-	*right_pad = *width - (int32_t) tmp;
-	*width = (int32_t) tmp;
+	*right_pad = *width - (xint32_t) tmp;
+	*width = (xint32_t) tmp;
     }
 }
 
@@ -300,27 +300,29 @@ pad_repeat_get_scanline_bounds (int32_t         source_image_width,
 #define GET_0565_ALPHA(s) 0xff
 #define GET_x888_ALPHA(s) 0xff
 
+#define abort()  return
+
 #define FAST_NEAREST_SCANLINE(scanline_func_name, SRC_FORMAT, DST_FORMAT,			\
 			      src_type_t, dst_type_t, OP, repeat_mode)				\
 static force_inline void									\
 scanline_func_name (dst_type_t       *dst,							\
 		    const src_type_t *src,							\
-		    int32_t           w,							\
+		    xint32_t           w,							\
 		    pixman_fixed_t    vx,							\
 		    pixman_fixed_t    unit_x,							\
 		    pixman_fixed_t    src_width_fixed,						\
 		    pixman_bool_t     fully_transparent_src)					\
 {												\
-	uint32_t   d;										\
+	xuint32_t   d;										\
 	src_type_t s1, s2;									\
-	uint8_t    a1, a2;									\
+	xuint8_t    a1, a2;									\
 	int        x1, x2;									\
 												\
 	if (PIXMAN_OP_ ## OP == PIXMAN_OP_OVER && fully_transparent_src)			\
 	    return;										\
 												\
 	if (PIXMAN_OP_ ## OP != PIXMAN_OP_SRC && PIXMAN_OP_ ## OP != PIXMAN_OP_OVER)		\
-	    abort();										\
+       abort();	 										\
 												\
 	while ((w -= 2) >= 0)									\
 	{											\
@@ -430,7 +432,7 @@ fast_composite_scaled_nearest  ## scale_func_name (pixman_implementation_t *imp,
     pixman_vector_t v;										\
     pixman_fixed_t vx, vy;									\
     pixman_fixed_t unit_x, unit_y;								\
-    int32_t left_pad, right_pad;								\
+    xint32_t left_pad, right_pad;								\
 												\
     src_type_t *src;										\
     dst_type_t *dst;										\
@@ -570,10 +572,10 @@ fast_composite_scaled_nearest  ## scale_func_name (pixman_implementation_t *imp,
 			      repeat_mode)							\
     static force_inline void									\
     scanline_func##scale_func_name##_wrapper (							\
-		    const uint8_t    *mask,							\
+		    const xuint8_t    *mask,							\
 		    dst_type_t       *dst,							\
 		    const src_type_t *src,							\
-		    int32_t          w,								\
+		    xint32_t          w,								\
 		    pixman_fixed_t   vx,							\
 		    pixman_fixed_t   unit_x,							\
 		    pixman_fixed_t   max_vx,							\
@@ -582,7 +584,7 @@ fast_composite_scaled_nearest  ## scale_func_name (pixman_implementation_t *imp,
 	scanline_func (dst, src, w, vx, unit_x, max_vx, fully_transparent_src);			\
     }												\
     FAST_NEAREST_MAINLOOP_INT (scale_func_name, scanline_func##scale_func_name##_wrapper,	\
-			       src_type_t, uint8_t, dst_type_t, repeat_mode, FALSE, FALSE)
+			       src_type_t, xuint8_t, dst_type_t, repeat_mode, FALSE, FALSE)
 
 #define FAST_NEAREST_MAINLOOP(scale_func_name, scanline_func, src_type_t, dst_type_t,		\
 			      repeat_mode)							\
@@ -757,14 +759,14 @@ fast_composite_scaled_nearest  ## scale_func_name (pixman_implementation_t *imp,
  * from the padding area around it or from both image and padding area.
  */
 static force_inline void
-bilinear_pad_repeat_get_scanline_bounds (int32_t         source_image_width,
+bilinear_pad_repeat_get_scanline_bounds (xint32_t         source_image_width,
 					 pixman_fixed_t  vx,
 					 pixman_fixed_t  unit_x,
-					 int32_t *       left_pad,
-					 int32_t *       left_tz,
-					 int32_t *       width,
-					 int32_t *       right_tz,
-					 int32_t *       right_pad)
+					 xint32_t *       left_pad,
+					 xint32_t *       left_tz,
+					 xint32_t *       width,
+					 xint32_t *       right_tz,
+					 xint32_t *       right_pad)
 {
 	int width1 = *width, left_pad1, right_pad1;
 	int width2 = *width, left_pad2, right_pad2;
@@ -790,7 +792,7 @@ bilinear_pad_repeat_get_scanline_bounds (int32_t         source_image_width,
  *		       const mask_type_ * mask,
  *		       const src_type_t * src_top,
  *		       const src_type_t * src_bottom,
- *		       int32_t            width,
+ *		       xint32_t            width,
  *		       int                weight_top,
  *		       int                weight_bottom,
  *		       pixman_fixed_t     vx,
@@ -839,7 +841,7 @@ fast_composite_scaled_bilinear ## scale_func_name (pixman_implementation_t *imp,
     pixman_vector_t v;										\
     pixman_fixed_t vx, vy;									\
     pixman_fixed_t unit_x, unit_y;								\
-    int32_t left_pad, left_tz, right_tz, right_pad;						\
+    xint32_t left_pad, left_tz, right_tz, right_pad;						\
 												\
     dst_type_t *dst;										\
     mask_type_t solid_mask;									\
@@ -903,7 +905,7 @@ fast_composite_scaled_bilinear ## scale_func_name (pixman_implementation_t *imp,
     {												\
 	vx = v.vector[0];									\
 	repeat (PIXMAN_REPEAT_NORMAL, &vx, pixman_int_to_fixed(src_image->bits.width));		\
-	max_x = pixman_fixed_to_int (vx + (width - 1) * (int64_t)unit_x) + 1;			\
+	max_x = pixman_fixed_to_int (vx + (width - 1) * (xint64_t)unit_x) + 1;			\
 												\
 	if (src_image->bits.width < REPEAT_NORMAL_MIN_WIDTH)					\
 	{											\
@@ -1071,8 +1073,8 @@ fast_composite_scaled_bilinear ## scale_func_name (pixman_implementation_t *imp,
 	}											\
 	else if (PIXMAN_REPEAT_ ## repeat_mode == PIXMAN_REPEAT_NORMAL)				\
 	{											\
-	    int32_t	    num_pixels;								\
-	    int32_t	    width_remain;							\
+	    xint32_t	    num_pixels;								\
+	    xint32_t	    width_remain;							\
 	    src_type_t *    src_line_top;							\
 	    src_type_t *    src_line_bottom;							\
 	    src_type_t	    buf1[2];								\

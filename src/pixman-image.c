@@ -24,10 +24,9 @@
 #include <config.h>
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#include <xC/xmemory.h>
+#include <xClib/string.h>
+#include <xC/xdebug.h>
 
 #include "pixman-private.h"
 
@@ -98,7 +97,7 @@ _pixman_init_gradient (gradient_t *                  gradient,
 	return FALSE;
 
     gradient->stops += 1;
-    memcpy (gradient->stops, stops, n_stops * sizeof (pixman_gradient_stop_t));
+    xmemory_copy (gradient->stops, stops, n_stops * sizeof (pixman_gradient_stop_t));
     gradient->n_stops = n_stops;
 
     gradient->common.property_changed = gradient_property_changed;
@@ -116,18 +115,18 @@ _pixman_image_init (pixman_image_t *image)
     common->alpha_count = 0;
     common->have_clip_region = FALSE;
     common->clip_sources = FALSE;
-    common->transform = NULL;
+    common->transform = XNULL;
     common->repeat = PIXMAN_REPEAT_NONE;
     common->filter = PIXMAN_FILTER_NEAREST;
-    common->filter_params = NULL;
+    common->filter_params = XNULL;
     common->n_filter_params = 0;
-    common->alpha_map = NULL;
+    common->alpha_map = XNULL;
     common->component_alpha = FALSE;
     common->ref_count = 1;
-    common->property_changed = NULL;
+    common->property_changed = XNULL;
     common->client_clip = FALSE;
-    common->destroy_func = NULL;
-    common->destroy_data = NULL;
+    common->destroy_func = XNULL;
+    common->destroy_data = XNULL;
     common->dirty = TRUE;
 }
 
@@ -145,8 +144,8 @@ _pixman_image_fini (pixman_image_t *image)
 
 	pixman_region32_fini (&common->clip_region);
 
-	free (common->transform);
-	free (common->filter_params);
+    xmemory_free (common->transform);
+    xmemory_free (common->filter_params);
 
 	if (common->alpha_map)
 	    pixman_image_unref ((pixman_image_t *)common->alpha_map);
@@ -158,19 +157,19 @@ _pixman_image_fini (pixman_image_t *image)
 	    if (image->gradient.stops)
 	    {
 		/* See _pixman_init_gradient() for an explanation of the - 1 */
-		free (image->gradient.stops - 1);
+        xmemory_free (image->gradient.stops - 1);
 	    }
 
 	    /* This will trigger if someone adds a property_changed
 	     * method to the linear/radial/conical gradient overwriting
 	     * the general one.
 	     */
-	    assert (
+        XASSERT (
 		image->common.property_changed == gradient_property_changed);
 	}
 
 	if (image->type == BITS && image->bits.free_me)
-	    free (image->bits.free_me);
+        xmemory_free (image->bits.free_me);
 
 	return TRUE;
     }
@@ -181,7 +180,7 @@ _pixman_image_fini (pixman_image_t *image)
 pixman_image_t *
 _pixman_image_allocate (void)
 {
-    pixman_image_t *image = malloc (sizeof (pixman_image_t));
+    pixman_image_t *image = xmemory_alloc (sizeof (pixman_image_t));
 
     if (image)
 	_pixman_image_init (image);
@@ -210,7 +209,7 @@ pixman_image_unref (pixman_image_t *image)
 {
     if (_pixman_image_fini (image))
     {
-	free (image);
+    xmemory_free (image);
 	return TRUE;
     }
 
@@ -265,7 +264,7 @@ static void
 compute_image_info (pixman_image_t *image)
 {
     pixman_format_code_t code;
-    uint32_t flags = 0;
+    xuint32_t flags = 0;
 
     /* Transform */
     if (!image->common.transform)
@@ -627,32 +626,32 @@ pixman_image_set_transform (pixman_image_t *          image,
     if (common->transform == transform)
 	return TRUE;
 
-    if (!transform || memcmp (&id, transform, sizeof (pixman_transform_t)) == 0)
+    if (!transform || xmemory_compare (&id, transform, sizeof (pixman_transform_t)) == 0)
     {
-	free (common->transform);
-	common->transform = NULL;
+    xmemory_free (common->transform);
+    common->transform = XNULL;
 	result = TRUE;
 
 	goto out;
     }
 
     if (common->transform &&
-	memcmp (common->transform, transform, sizeof (pixman_transform_t)) == 0)
+    xmemory_compare (common->transform, transform, sizeof (pixman_transform_t)) == 0)
     {
 	return TRUE;
     }
 
-    if (common->transform == NULL)
-	common->transform = malloc (sizeof (pixman_transform_t));
+    if (common->transform == XNULL)
+    common->transform = xmemory_alloc (sizeof (pixman_transform_t));
 
-    if (common->transform == NULL)
+    if (common->transform == XNULL)
     {
 	result = FALSE;
 
 	goto out;
     }
 
-    memcpy (common->transform, transform, sizeof(pixman_transform_t));
+    xmemory_copy (common->transform, transform, sizeof(pixman_transform_t));
 
     result = TRUE;
 
@@ -699,21 +698,21 @@ pixman_image_set_filter (pixman_image_t *      image,
 	    n_params == 4 + n_x_phases * width + n_y_phases * height, FALSE);
     }
     
-    new_params = NULL;
+    new_params = XNULL;
     if (params)
     {
 	new_params = pixman_malloc_ab (n_params, sizeof (pixman_fixed_t));
 	if (!new_params)
 	    return FALSE;
 
-	memcpy (new_params,
+    xmemory_copy (new_params,
 	        params, n_params * sizeof (pixman_fixed_t));
     }
 
     common->filter = filter;
 
     if (common->filter_params)
-	free (common->filter_params);
+    xmemory_free (common->filter_params);
 
     common->filter_params = new_params;
     common->n_filter_params = n_params;
@@ -755,8 +754,8 @@ pixman_image_set_indexed (pixman_image_t *        image,
 PIXMAN_EXPORT void
 pixman_image_set_alpha_map (pixman_image_t *image,
                             pixman_image_t *alpha_map,
-                            int16_t         x,
-                            int16_t         y)
+                            xint16_t         x,
+                            xint16_t         y)
 {
     image_common_t *common = (image_common_t *)image;
 
@@ -795,7 +794,7 @@ pixman_image_set_alpha_map (pixman_image_t *image,
 	}
 	else
 	{
-	    common->alpha_map = NULL;
+        common->alpha_map = XNULL;
 	}
     }
 
@@ -828,7 +827,7 @@ pixman_image_set_accessors (pixman_image_t *           image,
                             pixman_read_memory_func_t  read_func,
                             pixman_write_memory_func_t write_func)
 {
-    return_if_fail (image != NULL);
+    return_if_fail (image != XNULL);
 
     if (image->type == BITS)
     {
@@ -839,13 +838,13 @@ pixman_image_set_accessors (pixman_image_t *           image,
     }
 }
 
-PIXMAN_EXPORT uint32_t *
+PIXMAN_EXPORT xuint32_t *
 pixman_image_get_data (pixman_image_t *image)
 {
     if (image->type == BITS)
 	return image->bits.bits;
 
-    return NULL;
+    return XNULL;
 }
 
 PIXMAN_EXPORT int
@@ -870,7 +869,7 @@ PIXMAN_EXPORT int
 pixman_image_get_stride (pixman_image_t *image)
 {
     if (image->type == BITS)
-	return image->bits.rowstride * (int) sizeof (uint32_t);
+	return image->bits.rowstride * (int) sizeof (xuint32_t);
 
     return 0;
 }
@@ -893,12 +892,12 @@ pixman_image_get_format (pixman_image_t *image)
     return PIXMAN_null;
 }
 
-uint32_t
+xuint32_t
 _pixman_image_get_solid (pixman_implementation_t *imp,
 			 pixman_image_t *         image,
                          pixman_format_code_t     format)
 {
-    uint32_t result;
+    xuint32_t result;
 
     if (image->type == SOLID)
     {
@@ -911,7 +910,7 @@ _pixman_image_get_solid (pixman_implementation_t *imp,
 	else if (image->bits.format == PIXMAN_x8r8g8b8)
 	    result = image->bits.bits[0] | 0xff000000;
 	else if (image->bits.format == PIXMAN_a8)
-	    result = (*(uint8_t *)image->bits.bits) << 24;
+	    result = (*(xuint8_t *)image->bits.bits) << 24;
 	else
 	    goto otherwise;
     }
@@ -922,10 +921,10 @@ _pixman_image_get_solid (pixman_implementation_t *imp,
     otherwise:
 	_pixman_implementation_iter_init (
 	    imp, &iter, image, 0, 0, 1, 1,
-	    (uint8_t *)&result,
+	    (xuint8_t *)&result,
 	    ITER_NARROW | ITER_SRC, image->common.flags);
 	
-	result = *iter.get_scanline (&iter, NULL);
+    result = *iter.get_scanline (&iter, XNULL);
 
 	if (iter.fini)
 	    iter.fini (&iter);

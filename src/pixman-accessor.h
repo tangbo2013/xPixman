@@ -7,9 +7,9 @@
 
 #define MEMSET_WRAPPED(img, dst, val, size)				\
     do {								\
-	size_t _i;							\
-	uint8_t *_dst = (uint8_t*)(dst);				\
-	for(_i = 0; _i < (size_t) size; _i++) {				\
+    xsize_t _i;							\
+	xuint8_t *_dst = (xuint8_t*)(dst);				\
+    for(_i = 0; _i < (xsize_t) size; _i++) {				\
 	    WRITE((img), _dst +_i, (val));				\
 	}								\
     } while (0)
@@ -19,7 +19,7 @@
 #define READ(img, ptr)		(*(ptr))
 #define WRITE(img, ptr, val)	(*(ptr) = (val))
 #define MEMSET_WRAPPED(img, dst, val, size)				\
-    memset(dst, val, size)
+    xmemory_set(dst, val, size)
 
 #endif
 

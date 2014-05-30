@@ -24,7 +24,7 @@
 #include <config.h>
 #endif
 
-#include <string.h>
+#include <xClib/string.h>
 
 #include "pixman-private.h"
 #include "pixman-accessor.h"
@@ -81,15 +81,15 @@
     (((x) & ~(0xf << SHIFT_4 (o))) | (((v) & 0xf) << SHIFT_4 (o)))
 
 #define DEFINE_ALPHA(line, x)						\
-    uint8_t   *__ap = (uint8_t *) line + ((x) >> 1);			\
+    xuint8_t   *__ap = (xuint8_t *) line + ((x) >> 1);			\
     int __ao = (x) & 1
 
 #define STEP_ALPHA      ((__ap += __ao), (__ao ^= 1))
 
 #define ADD_ALPHA(a)							\
     {									\
-        uint8_t __o = READ (image, __ap);				\
-        uint8_t __a = (a) + GET_4 (__o, __ao);				\
+        xuint8_t __o = READ (image, __ap);				\
+        xuint8_t __a = (a) + GET_4 (__o, __ao);				\
         WRITE (image, __ap, PUT_4 (__o, __ao, __a | (0 - ((__a) >> 4)))); \
     }
 
@@ -118,7 +118,7 @@
  * 8 bit alpha
  */
 
-static force_inline uint8_t
+static force_inline xuint8_t
 clip255 (int x)
 {
     if (x > 255)
@@ -131,7 +131,7 @@ clip255 (int x)
     do									\
     {									\
         int i__ = (length);						\
-        uint8_t *buf__ = (buf);						\
+        xuint8_t *buf__ = (buf);						\
         int val__ = (val);						\
 									\
         while (i__--)							\
@@ -160,10 +160,10 @@ rasterize_edges_8 (pixman_image_t *image,
                    pixman_fixed_t  b)
 {
     pixman_fixed_t y = t;
-    uint32_t  *line;
+    xuint32_t  *line;
     int fill_start = -1, fill_end = -1;
     int fill_size = 0;
-    uint32_t *buf = (image)->bits.bits;
+    xuint32_t *buf = (image)->bits.bits;
     int stride = (image)->bits.rowstride;
     int width = (image)->bits.width;
 
@@ -171,7 +171,7 @@ rasterize_edges_8 (pixman_image_t *image,
 
     for (;;)
     {
-        uint8_t *ap = (uint8_t *) line;
+        xuint8_t *ap = (xuint8_t *) line;
         pixman_fixed_t lx, rx;
         int lxi, rxi;
 

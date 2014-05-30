@@ -25,8 +25,7 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <xC/xmemory.h>
 #include "pixman-private.h"
 
 /*
@@ -231,8 +230,8 @@ pixman_line_fixed_edge_init (pixman_edge_t *            e,
 
 PIXMAN_EXPORT void
 pixman_add_traps (pixman_image_t *     image,
-                  int16_t              x_off,
-                  int16_t              y_off,
+                  xint16_t              x_off,
+                  xint16_t              y_off,
                   int                  ntrap,
                   const pixman_trap_t *traps)
 {
@@ -303,8 +302,8 @@ dump_image (pixman_image_t *image,
 
     for (i = 0; i < image->bits.height; ++i)
     {
-	uint8_t *line =
-	    (uint8_t *)&(image->bits.bits[i * image->bits.rowstride]);
+	xuint8_t *line =
+	    (xuint8_t *)&(image->bits.bits[i * image->bits.rowstride]);
 
 	for (j = 0; j < image->bits.width; ++j)
 	    printf ("%c", line[j] ? '#' : ' ');
@@ -316,7 +315,7 @@ dump_image (pixman_image_t *image,
 
 PIXMAN_EXPORT void
 pixman_add_trapezoids (pixman_image_t *          image,
-                       int16_t                   x_off,
+                       xint16_t                   x_off,
                        int                       y_off,
                        int                       ntraps,
                        const pixman_trapezoid_t *traps)
@@ -524,7 +523,7 @@ pixman_composite_trapezoids (pixman_op_t		op,
 	    return;
 	
 	if (!(tmp = pixman_image_create_bits (
-		  mask_format, box.x2 - box.x1, box.y2 - box.y1, NULL, -1)))
+          mask_format, box.x2 - box.x1, box.y2 - box.y1, XNULL, -1)))
 	    return;
 	
 	for (i = 0; i < n_traps; ++i)
@@ -656,11 +655,11 @@ convert_triangles (int n_tris, const pixman_triangle_t *tris)
     int i;
 
     if (n_tris <= 0)
-	return NULL;
+    return XNULL;
     
     traps = pixman_malloc_ab (n_tris, 2 * sizeof (pixman_trapezoid_t));
     if (!traps)
-	return NULL;
+    return XNULL;
 
     for (i = 0; i < n_tris; ++i)
 	triangle_to_trapezoids (&(tris[i]), traps + 2 * i);
@@ -688,14 +687,14 @@ pixman_composite_triangles (pixman_op_t			op,
 				     x_src, y_src, x_dst, y_dst,
 				     n_tris * 2, traps);
 	
-	free (traps);
+    xmemory_free (traps);
     }
 }
 
 PIXMAN_EXPORT void
 pixman_add_triangles (pixman_image_t          *image,
-		      int32_t	               x_off,
-		      int32_t	               y_off,
+		      xint32_t	               x_off,
+		      xint32_t	               y_off,
 		      int	               n_tris,
 		      const pixman_triangle_t *tris)
 {
@@ -706,6 +705,6 @@ pixman_add_triangles (pixman_image_t          *image,
 	pixman_add_trapezoids (image, x_off, y_off,
 			       n_tris * 2, traps);
 
-	free (traps);
+    xmemory_free (traps);
     }
 }

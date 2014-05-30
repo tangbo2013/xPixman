@@ -24,7 +24,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdlib.h>
+#include <xC/xmemory.h>
 #include "pixman-private.h"
 
 pixman_implementation_t *
@@ -33,19 +33,19 @@ _pixman_implementation_create (pixman_implementation_t *fallback,
 {
     pixman_implementation_t *imp;
 
-    assert (fast_paths);
+    XASSERT (XNULL != fast_paths);
 
-    if ((imp = malloc (sizeof (pixman_implementation_t))))
+    if ((imp = xmemory_alloc (sizeof (pixman_implementation_t))))
     {
 	pixman_implementation_t *d;
 
-	memset (imp, 0, sizeof *imp);
+    xmemory_set (imp, 0, sizeof *imp);
 
 	imp->fallback = fallback;
 	imp->fast_paths = fast_paths;
 	
 	/* Make sure the whole fallback chain has the right toplevel */
-	for (d = imp; d != NULL; d = d->fallback)
+	for (d = imp; d != XNULL; d = d->fallback)
 	    d->toplevel = imp;
     }
 
@@ -75,11 +75,11 @@ void
 _pixman_implementation_lookup_composite (pixman_implementation_t  *toplevel,
 					 pixman_op_t               op,
 					 pixman_format_code_t      src_format,
-					 uint32_t                  src_flags,
+					 xuint32_t                  src_flags,
 					 pixman_format_code_t      mask_format,
-					 uint32_t                  mask_flags,
+					 xuint32_t                  mask_flags,
 					 pixman_format_code_t      dest_format,
-					 uint32_t                  dest_flags,
+					 xuint32_t                  dest_flags,
 					 pixman_implementation_t **out_imp,
 					 pixman_composite_func_t  *out_func)
 {
@@ -115,7 +115,7 @@ _pixman_implementation_lookup_composite (pixman_implementation_t  *toplevel,
 	}
     }
 
-    for (imp = toplevel; imp != NULL; imp = imp->fallback)
+    for (imp = toplevel; imp != XNULL; imp = imp->fallback)
     {
 	const pixman_fast_path_t *info = imp->fast_paths;
 
@@ -157,7 +157,7 @@ _pixman_implementation_lookup_composite (pixman_implementation_t  *toplevel,
         "The most likely cause of this is that this system has issues with\n"
         "thread local storage\n");
 
-    *out_imp = NULL;
+    *out_imp = XNULL;
     *out_func = dummy_composite_rect;
     return;
 
@@ -182,9 +182,9 @@ update_cache:
 static void
 dummy_combine (pixman_implementation_t *imp,
 	       pixman_op_t              op,
-	       uint32_t *               pd,
-	       const uint32_t *         ps,
-	       const uint32_t *         pm,
+	       xuint32_t *               pd,
+	       const xuint32_t *         ps,
+	       const xuint32_t *         pm,
 	       int                      w)
 {
 }
@@ -197,7 +197,7 @@ _pixman_implementation_lookup_combiner (pixman_implementation_t *imp,
 {
     while (imp)
     {
-	pixman_combine_32_func_t f = NULL;
+	pixman_combine_32_func_t f = XNULL;
 
 	switch ((narrow << 1) | component_alpha)
 	{
@@ -231,8 +231,8 @@ _pixman_implementation_lookup_combiner (pixman_implementation_t *imp,
 
 pixman_bool_t
 _pixman_implementation_blt (pixman_implementation_t * imp,
-                            uint32_t *                src_bits,
-                            uint32_t *                dst_bits,
+                            xuint32_t *                src_bits,
+                            xuint32_t *                dst_bits,
                             int                       src_stride,
                             int                       dst_stride,
                             int                       src_bpp,
@@ -262,14 +262,14 @@ _pixman_implementation_blt (pixman_implementation_t * imp,
 
 pixman_bool_t
 _pixman_implementation_fill (pixman_implementation_t *imp,
-                             uint32_t *               bits,
+                             xuint32_t *               bits,
                              int                      stride,
                              int                      bpp,
                              int                      x,
                              int                      y,
                              int                      width,
                              int                      height,
-                             uint32_t                 filler)
+                             xuint32_t                 filler)
 {
     while (imp)
     {
@@ -285,10 +285,10 @@ _pixman_implementation_fill (pixman_implementation_t *imp,
     return FALSE;
 }
 
-static uint32_t *
-get_scanline_null (pixman_iter_t *iter, const uint32_t *mask)
+static xuint32_t *
+get_scanline_null (pixman_iter_t *iter, const xuint32_t *mask)
 {
-    return NULL;
+    return XNULL;
 }
 
 void
@@ -299,21 +299,21 @@ _pixman_implementation_iter_init (pixman_implementation_t *imp,
                                   int                      y,
                                   int                      width,
                                   int                      height,
-                                  uint8_t                 *buffer,
+                                  xuint8_t                 *buffer,
                                   iter_flags_t             iter_flags,
-                                  uint32_t                 image_flags)
+                                  xuint32_t                 image_flags)
 {
     pixman_format_code_t format;
 
     iter->image = image;
-    iter->buffer = (uint32_t *)buffer;
+    iter->buffer = (xuint32_t *)buffer;
     iter->x = x;
     iter->y = y;
     iter->width = width;
     iter->height = height;
     iter->iter_flags = iter_flags;
     iter->image_flags = image_flags;
-    iter->fini = NULL;
+    iter->fini = XNULL;
 
     if (!iter->image)
     {
@@ -352,30 +352,30 @@ _pixman_implementation_iter_init (pixman_implementation_t *imp,
 pixman_bool_t
 _pixman_disabled (const char *name)
 {
-    const char *env;
+//    const char *env;
 
-    if ((env = getenv ("PIXMAN_DISABLE")))
-    {
-	do
-	{
-	    const char *end;
-	    int len;
+//    if ((env = getenv ("PIXMAN_DISABLE")))
+//    {
+//	do
+//	{
+//	    const char *end;
+//	    int len;
 
-	    if ((end = strchr (env, ' ')))
-		len = end - env;
-	    else
-		len = strlen (env);
+//	    if ((end = strchr (env, ' ')))
+//		len = end - env;
+//	    else
+//		len = strlen (env);
 
-	    if (strlen (name) == len && strncmp (name, env, len) == 0)
-	    {
-		printf ("pixman: Disabled %s implementation\n", name);
-		return TRUE;
-	    }
+//	    if (strlen (name) == len && strncmp (name, env, len) == 0)
+//	    {
+//		printf ("pixman: Disabled %s implementation\n", name);
+//		return TRUE;
+//	    }
 
-	    env += len;
-	}
-	while (*env++);
-    }
+//	    env += len;
+//	}
+//	while (*env++);
+//    }
 
     return FALSE;
 }

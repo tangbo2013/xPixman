@@ -28,8 +28,8 @@
 #include <config.h>
 #endif
 
-#include <stdlib.h>
-#include <math.h>
+#include <xC/xmemory.h>
+#include <xClib/math.h>
 #include "pixman-private.h"
 
 static force_inline double
@@ -50,18 +50,18 @@ coordinates_to_parameter (double x, double y, double angle)
 				      */
 }
 
-static uint32_t *
-conical_get_scanline_narrow (pixman_iter_t *iter, const uint32_t *mask)
+static xuint32_t *
+conical_get_scanline_narrow (pixman_iter_t *iter, const xuint32_t *mask)
 {
     pixman_image_t *image = iter->image;
     int x = iter->x;
     int y = iter->y;
     int width = iter->width;
-    uint32_t *buffer = iter->buffer;
+    xuint32_t *buffer = iter->buffer;
 
     gradient_t *gradient = (gradient_t *)image;
     conical_gradient_t *conical = (conical_gradient_t *)image;
-    uint32_t       *end = buffer + width;
+    xuint32_t       *end = buffer + width;
     pixman_gradient_walker_t walker;
     pixman_bool_t affine = TRUE;
     double cx = 1.;
@@ -160,10 +160,10 @@ conical_get_scanline_narrow (pixman_iter_t *iter, const uint32_t *mask)
     return iter->buffer;
 }
 
-static uint32_t *
-conical_get_scanline_wide (pixman_iter_t *iter, const uint32_t *mask)
+static xuint32_t *
+conical_get_scanline_wide (pixman_iter_t *iter, const xuint32_t *mask)
 {
-    uint32_t *buffer = conical_get_scanline_narrow (iter, NULL);
+    xuint32_t *buffer = conical_get_scanline_narrow (iter, XNULL);
 
     pixman_expand_to_float (
 	(argb_t *)buffer, buffer, PIXMAN_a8r8g8b8, iter->width);
@@ -190,14 +190,14 @@ pixman_image_create_conical_gradient (const pixman_point_fixed_t *  center,
     conical_gradient_t *conical;
 
     if (!image)
-	return NULL;
+	return XNULL;
 
     conical = &image->conical;
 
     if (!_pixman_init_gradient (&conical->common, stops, n_stops))
     {
-	free (image);
-	return NULL;
+    xmemory_free (image);
+	return XNULL;
     }
 
     angle = MOD (angle, pixman_int_to_fixed (360));

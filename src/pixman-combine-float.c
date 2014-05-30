@@ -29,9 +29,8 @@
 #include <config.h>
 #endif
 
-#include <math.h>
-#include <string.h>
-#include <float.h>
+#include <xClib/math.h>
+#include <xClib/string.h>
 
 #include "pixman-private.h"
 
@@ -456,7 +455,7 @@ blend_soft_light (float sa, float s, float da, float d)
 	    if (4 * d <= da)
 		return d * sa + (2 * s - sa) * d * ((16 * d / da - 12) * d / da + 3);
 	    else
-		return d * sa + (sqrtf (d * da) - d) * (2 * s - sa);
+        return d * sa + (math_sqrt ((double)(d * da)) - d) * (2 * s - sa);
 	}
     }
 }
