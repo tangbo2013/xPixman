@@ -11,7 +11,6 @@ TEMPLATE = lib
 CONFIG += staticlib
 INCLUDEPATH += ../../../
 
-DEFINES += PACKAGE
 DEFINES += HAVE_CONFIG_H
 
 QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare
@@ -31,26 +30,14 @@ HEADERS += \
     ../../pixman-version.h \
     ../pixman-version.h.in \
     ../pixman-private.h \
-    ../pixman-mips-memcpy-asm.S \
-    ../pixman-mips-dspr2.h \
-    ../pixman-mips-dspr2-asm.S \
-    ../pixman-mips-dspr2-asm.h \
     ../pixman-inlines.h \
     ../pixman-edge-imp.h \
     ../pixman-compiler.h \
     ../pixman-combine32.h \
-    ../pixman-arm-simd-asm.S \
-    ../pixman-arm-simd-asm.h \
-    ../pixman-arm-simd-asm-scaled.S \
-    ../pixman-arm-neon-asm.S \
-    ../pixman-arm-neon-asm.h \
-    ../pixman-arm-common.h \
     ../pixman-accessor.h \
-    ../loongson-mmintrin.h \
     ../config.h
 
 OTHER_FILES += \
-    ../pixman-arm-neon-asm-bilinear.S
 
 SOURCES += \
     ../pixman.c \
@@ -78,8 +65,5 @@ SOURCES += \
     ../pixman-combine32.c \
     ../pixman-combine-float.c \
     ../pixman-bits-image.c \
-    ../pixman-arm.c \
-    ../pixman-arm-simd.c \
-    ../pixman-arm-neon.c \
     ../pixman-access.c \
     ../pixman-access-accessors.c
