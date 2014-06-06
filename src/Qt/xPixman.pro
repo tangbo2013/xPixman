@@ -43,7 +43,6 @@ SOURCES += \
     ../pixman.c \
     ../pixman-utils.c \
     ../pixman-trap.c \
-    ../pixman-timer.c \
     ../pixman-solid-fill.c \
     ../pixman-region32.c \
     ../pixman-region16.c \
