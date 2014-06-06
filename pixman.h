@@ -87,7 +87,7 @@ PIXMAN_BEGIN_DECLS
 
 #if !defined (PIXMAN_DONT_DEFINE_STDINT)
 
-#include "../xC/xinteger.h"
+#include <xC/xinteger.h>
 
 #endif
 

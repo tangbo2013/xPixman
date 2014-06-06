@@ -12,7 +12,7 @@ CONFIG += staticlib
 INCLUDEPATH += ../../../
 
 DEFINES += PACKAGE
-DEFINES += PIXMAN_NO_TLS
+DEFINES += HAVE_CONFIG_H
 
 QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare
 QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare
@@ -46,7 +46,8 @@ HEADERS += \
     ../pixman-arm-neon-asm.h \
     ../pixman-arm-common.h \
     ../pixman-accessor.h \
-    ../loongson-mmintrin.h
+    ../loongson-mmintrin.h \
+    ../config.h
 
 OTHER_FILES += \
     ../pixman-arm-neon-asm-bilinear.S
