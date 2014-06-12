@@ -28,7 +28,6 @@ unix:!symbian {
 HEADERS += \
     ../../pixman.h \
     ../../pixman-version.h \
-    ../pixman-version.h.in \
     ../pixman-private.h \
     ../pixman-inlines.h \
     ../pixman-edge-imp.h \
