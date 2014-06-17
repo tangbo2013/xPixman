@@ -9,21 +9,10 @@ QT       -= core gui
 TARGET = xPixman
 TEMPLATE = lib
 CONFIG += staticlib
-INCLUDEPATH += ../../../
 
+INCLUDEPATH = ../../../
 DEFINES += HAVE_CONFIG_H
-
 QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare
-QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
 
 HEADERS += \
     ../../pixman.h \
@@ -35,8 +24,6 @@ HEADERS += \
     ../pixman-combine32.h \
     ../pixman-accessor.h \
     ../config.h
-
-OTHER_FILES += \
 
 SOURCES += \
     ../pixman.c \
@@ -65,3 +52,4 @@ SOURCES += \
     ../pixman-bits-image.c \
     ../pixman-access.c \
     ../pixman-access-accessors.c
+
